@@ -331,6 +331,5 @@ namespace SFInput
 		}
 
 		private string m_name;
-		private float  m_threshold;
 	}
 }

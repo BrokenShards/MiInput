@@ -155,6 +155,39 @@ namespace SFInput
 		}
 
 		/// <summary>
+		///   Checks if the given axis is pressed.
+		/// </summary>
+		/// <param name="axis">
+		///   The axis index.
+		/// </param>
+		/// <returns>
+		///   True if <paramref name="axis"/> is within range and it is pressed, otherwise false.
+		/// </returns>
+		public bool IsAxisPressed( uint axis )
+		{
+			if( axis >= m_axies.Length )
+				return false;
+
+			return m_axies[ axis ] >= Input.AxisPressThreshold;
+		}
+		/// <summary>
+		///   Checks if the axis represented by the given string is pressed.
+		/// </summary>
+		/// <param name="axis">
+		///   The string to parse.
+		/// </param>
+		/// <returns>
+		///   True if <paramref name="axis"/> represents a valid axis and is pressed, otherwise false.
+		/// </returns>
+		public bool IsAxisPressed( string axis )
+		{
+			if( !JoystickManager.IsAxis( axis ) )
+				return false;
+
+			return IsPressed( (uint)JoystickManager.ToAxis( axis ).Value );
+		}
+
+		/// <summary>
 		///   Updates the joystick state.
 		/// </summary>
 		public void Update()

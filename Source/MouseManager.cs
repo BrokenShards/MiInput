@@ -170,6 +170,17 @@ namespace SFInput
 			return m_current.Position;
 		}
 		/// <summary>
+		///   Get the previous mouse position in desktop coordinates.
+		/// </summary>
+		/// <returns>
+		///   The previous mouse position relative to the desktop.
+		/// </returns>
+		public Vector2i GetLastPosition()
+		{
+			return m_last.Position;
+		}
+
+		/// <summary>
 		///   Get the current mouse position relative to the given window.
 		/// </summary>
 		/// <param name="window">
@@ -217,6 +228,81 @@ namespace SFInput
 
 			return GetAxis( ToAxis( axis ).Value );
 		}
+		/// <summary>
+		///   Gets the value of the given mouse axis relative to the given window.
+		/// </summary>
+		/// <param name="axis">
+		///   The mouse axis.
+		/// </param>
+		/// <param name="window">
+		///   The window.
+		/// </param>
+		/// <returns>
+		///   The value of the given mouse axis relative to the given window.
+		/// </returns>
+		public float GetAxis( MouseAxis axis, Window window )
+		{
+			if( axis == MouseAxis.XPosition )
+				return GetPosition( window ).X;
+			else if( axis == MouseAxis.YPosition )
+				return GetPosition( window ).Y;
+
+			return 0.0f;
+		}
+		/// <summary>
+		///   Gets the value of the given mouse axis relative to the given window.
+		/// </summary>
+		/// <param name="axis">
+		///   The name or number of the mouse axis.
+		/// </param>
+		/// <param name="window">
+		///   The window.
+		/// </param>
+		/// <returns>
+		///   The value of the given mouse axis relative to the given window.
+		/// </returns>
+		public float GetAxis( string axis, Window window )
+		{
+			if( !IsAxis( axis ) )
+				return 0.0f;
+
+			return GetAxis( ToAxis( axis ).Value, window );
+		}
+
+		/// <summary>
+		///   Get the previous value of the given mouse axis.
+		/// </summary>
+		/// <param name="axis">
+		///   The mouse axis.
+		/// </param>
+		/// <returns>
+		///   The previous value of the given mouse axis.
+		/// </returns>
+		public float GetLastAxis( MouseAxis axis )
+		{
+			if( axis == MouseAxis.XPosition )
+				return GetLastPosition().X;
+			else if( axis == MouseAxis.YPosition )
+				return GetLastPosition().Y;
+
+			return 0.0f;
+		}
+		/// <summary>
+		///   Get the previous value of the given mouse axis.
+		/// </summary>
+		/// <param name="axis">
+		///   The name or number of the mouse axis.
+		/// </param>
+		/// <returns>
+		///   The previous value of the given mouse axis.
+		/// </returns>
+		public float GetLastAxis( string axis )
+		{
+			if( !IsAxis( axis ) )
+				return 0.0f;
+
+			return GetLastAxis( ToAxis( axis ).Value );
+		}
 
 		/// <summary>
 		///   Get the delta value of the given mouse axis.
@@ -252,48 +338,85 @@ namespace SFInput
 
 			return GetAxisDelta( ToAxis( axis ).Value );
 		}
-
 		/// <summary>
-		///   Gets the value of the given mouse axis relative to the given window.
+		///   Check if the given axis is pressed.
 		/// </summary>
 		/// <param name="axis">
-		///   The mouse axis.
-		/// </param>
-		/// <param name="window">
-		///   The window.
+		///   The axis to check.
 		/// </param>
 		/// <returns>
-		///   The value of the given mouse axis relative to the given window.
+		///   True if the given axis is pressed and false otherwise.
 		/// </returns>
-		public float GetAxis( MouseAxis axis, Window window )
+		public bool IsAxisPressed( MouseAxis axis )
 		{
-			if( axis == MouseAxis.XPosition )
-				return GetPosition( window ).X;
-			else if( axis == MouseAxis.YPosition )
-				return GetPosition( window ).Y;
-
-			return 0.0f;
+			return m_current.IsAxisPressed( axis );
 		}
-
 		/// <summary>
-		///   Gets the value of the given mouse axis relative to the given window.
+		///   Check if the given axis is pressed.
 		/// </summary>
 		/// <param name="axis">
-		///   The name or number of the mouse axis.
-		/// </param>
-		/// <param name="window">
-		///   The window.
+		///   The axis to check.
 		/// </param>
 		/// <returns>
-		///   The value of the given mouse axis relative to the given window.
+		///   True if the given axis is pressed and false otherwise.
 		/// </returns>
-		public float GetAxis( string axis, Window window )
+		public bool IsAxisPressed( string axis )
 		{
-			if( !IsAxis( axis ) )
-				return 0.0f;
-
-			return GetAxis( ToAxis( axis ).Value, window );
+			return m_current.IsAxisPressed( axis );
 		}
+		/// <summary>
+		///   Check if the given axis has just been pressed.
+		/// </summary>
+		/// <param name="axis">
+		///   The axis to check.
+		/// </param>
+		/// <returns>
+		///   True if the given axis has just been pressed and false otherwise.
+		/// </returns>
+		public bool AxisJustPressed( MouseAxis axis )
+		{
+			return m_current.IsAxisPressed( axis ) && !m_last.IsAxisPressed( axis );
+		}
+		/// <summary>
+		///   Check if the given axis has just been pressed.
+		/// </summary>
+		/// <param name="axis">
+		///   The axis to check.
+		/// </param>
+		/// <returns>
+		///   True if the given axis has just been pressed and false otherwise.
+		/// </returns>
+		public bool AxisJustPressed( string axis )
+		{
+			return m_current.IsAxisPressed( axis ) && !m_last.IsAxisPressed( axis );
+		}
+		/// <summary>
+		///   Check if the given axis has just been released.
+		/// </summary>
+		/// <param name="axis">
+		///   The axis to check.
+		/// </param>
+		/// <returns>
+		///   True if the given axis has just been released and false otherwise.
+		/// </returns>
+		public bool AxisJustReleased( MouseAxis axis )
+		{
+			return !m_current.IsAxisPressed( axis ) && m_last.IsAxisPressed( axis );
+		}
+		/// <summary>
+		///   Check if the given axis has just been released.
+		/// </summary>
+		/// <param name="axis">
+		///   The axis to check.
+		/// </param>
+		/// <returns>
+		///   True if the given axis has just been released and false otherwise.
+		/// </returns>
+		public bool AxisJustReleased( string axis )
+		{
+			return !m_current.IsAxisPressed( axis ) && m_last.IsAxisPressed( axis );
+		}
+
 
 		/// <summary>
 		///   Check if the given button is pressed.

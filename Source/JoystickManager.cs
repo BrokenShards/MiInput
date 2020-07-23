@@ -202,7 +202,6 @@ namespace SFInput
 
 			return m_current[ joystick ].IsPressed( but );
 		}
-
 		/// <summary>
 		///   Check if the given button was just pressed.
 		/// </summary>
@@ -241,7 +240,6 @@ namespace SFInput
 
 			return m_current[ joystick ].IsPressed( but ) && !m_last[ joystick ].IsPressed( but );
 		}
-
 		/// <summary>
 		///   Check if the given button was just released.
 		/// </summary>
@@ -323,6 +321,47 @@ namespace SFInput
 		}
 
 		/// <summary>
+		///   Gets the previous value of the given axis from the given joystick player index.
+		/// </summary>
+		/// <param name="joystick">
+		///   The player index of the joystick.
+		/// </param>
+		/// <param name="axis">
+		///   The axis to check.
+		/// </param>
+		/// <returns>
+		///   The previous value of the given axis from the given joystick player index. Will also return zero if 
+		///   <paramref name="axis"/> or <paramref name="joystick"/> are out of range or not connected.
+		/// </returns>
+		public float GetLastAxis( uint joystick, Joystick.Axis axis )
+		{
+			if( axis < 0 || (uint)axis >= Joystick.AxisCount || joystick >= Joystick.Count || !IsConnected( joystick ) )
+				return 0.0f;
+
+			return m_last?[ joystick ]?.GetAxis( axis ) ?? 0.0f;
+		}
+		/// <summary>
+		///   Gets the previous value of the given axis from the given joystick player index.
+		/// </summary>
+		/// <param name="joystick">
+		///   The player index of the joystick.
+		/// </param>
+		/// <param name="axis">
+		///   The axis to check.
+		/// </param>
+		/// <returns>
+		///   The previous value of the given axis from the given joystick player index. Will also return zero if 
+		///   <paramref name="axis"/> or <paramref name="joystick"/> are out of range or not connected.
+		/// </returns>
+		public float GetLastAxis( uint joystick, string axis )
+		{
+			if( joystick >= Joystick.Count || !IsConnected( joystick ) )
+				return 0.0f;
+
+			return m_last?[ joystick ]?.GetAxis( axis ) ?? 0.0f;
+		}
+
+		/// <summary>
 		///   Gets the difference in value between the last two update calls of the given axis from the given joystick
 		///   player index.
 		/// </summary>
@@ -365,6 +404,121 @@ namespace SFInput
 				return 0.0f;
 
 			return m_current[ joystick ].GetAxis( axis ) - m_last[ joystick ].GetAxis( axis );
+		}
+
+		/// <summary>
+		///   Check if the given axis is pressed.
+		/// </summary>
+		/// <param name="joystick">
+		///   The joystick index.
+		/// </param>
+		/// <param name="axis">
+		///   The axis to check.
+		/// </param>
+		/// <returns>
+		///   True if the given axis is pressed and false otherwise.
+		/// </returns>
+		public bool IsAxisPressed( uint joystick, uint axis )
+		{
+			if( joystick >= Joystick.Count )
+				return false;
+
+			return m_current[ joystick ].IsAxisPressed( axis );
+		}
+		/// <summary>
+		///   Check if the given axis is pressed.
+		/// </summary>
+		/// <param name="joystick">
+		///   The joystick index.
+		/// </param>
+		/// <param name="axis">
+		///   The axis to check.
+		/// </param>
+		/// <returns>
+		///   True if the given axis is pressed and false otherwise.
+		/// </returns>
+		public bool IsAxisPressed( uint joystick, string axis )
+		{
+			if( joystick >= Joystick.Count )
+				return false;
+
+			return m_current[ joystick ].IsAxisPressed( axis );
+		}
+		/// <summary>
+		///   Check if the given axis was just pressed.
+		/// </summary>
+		/// <param name="joystick">
+		///   The joystick index.
+		/// </param>
+		/// <param name="axis">
+		///   The axis to check.
+		/// </param>
+		/// <returns>
+		///   True if the given axis was just pressed and false otherwise.
+		/// </returns>
+		public bool AxisJustPressed( uint joystick, uint axis )
+		{
+			if( joystick >= Joystick.Count )
+				return false;
+
+			return m_current[ joystick ].IsAxisPressed( axis ) && !m_last[ joystick ].IsAxisPressed( axis );
+		}
+		/// <summary>
+		///   Check if the given axis was just pressed.
+		/// </summary>
+		/// <param name="joystick">
+		///   The joystick index.
+		/// </param>
+		/// <param name="axis">
+		///   The axis to check.
+		/// </param>
+		/// <returns>
+		///   True if the given axis was just pressed and false otherwise.
+		/// </returns>
+		public bool AxisJustPressed( uint joystick, string axis )
+		{
+			if( joystick >= Joystick.Count )
+				return false;
+
+			return m_current[ joystick ].IsAxisPressed( axis ) && !m_last[ joystick ].IsAxisPressed( axis );
+		}
+		/// <summary>
+		///   Check if the given axis was just released.
+		/// </summary>
+		/// <param name="joystick">
+		///   The joystick index.
+		/// </param>
+		/// <param name="axis">
+		///   The axis to check.
+		/// </param>
+		/// <returns>
+		///   True if the given axis was just released and false otherwise.
+		/// </returns>
+		public bool AxisJustReleased( uint joystick, uint axis )
+		{
+			if( joystick >= Joystick.Count )
+				return false;
+
+			return !m_current[ joystick ].IsAxisPressed( axis ) && m_last[ joystick ].IsAxisPressed( axis );
+		}
+		/// <summary>
+		///   Check if the given axis was just released.
+		/// </summary>
+		/// <param name="joystick">
+		///   The joystick index.
+		/// </param>
+		/// <param name="axis">
+		///   The axis to check.
+		/// </param>
+		/// <returns>
+		///   True if the given axis was just released and false otherwise.
+		/// </returns>
+		public bool AxisJustReleased( uint joystick, string axis )
+		{
+			if( joystick >= Joystick.Count )
+				return false;
+
+			return !m_current[ joystick ].IsAxisPressed( axis ) && m_last[ joystick ].IsAxisPressed( axis );
 		}
 
 		private JoystickState[] m_current,

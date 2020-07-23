@@ -31,6 +31,8 @@ namespace SFInput
 	/// </summary>
 	public class Input
 	{
+		public const float AxisPressThreshold = 0.4f;
+
 		/// <summary>
 		///   Default input settings path.
 		/// </summary>
@@ -79,6 +81,66 @@ namespace SFInput
 				return JoystickManager.IsAxis( axis );
 
 			return false;
+		}
+
+		private Input()
+		{
+			Keyboard = new KeyboardManager();
+			Mouse    = new MouseManager();
+			Joystick = new JoystickManager();
+			Actions  = new ActionSet();
+		}
+
+		/// <summary>
+		///   The singleton input manager instance.
+		/// </summary>
+		public static Input Manager
+		{
+			get
+			{
+				if( _instance == null )
+				{
+					lock( _syncRoot )
+					{
+						if( _instance == null )
+						{
+							_instance = new Input();
+						}
+					}
+				}
+
+				return _instance;
+			}
+		}
+
+		/// <summary>
+		///   Keyboard manager.
+		/// </summary>
+		public KeyboardManager Keyboard
+		{
+			get; private set;
+		}
+		/// <summary>
+		///   Mouse manager.
+		/// </summary>
+		public MouseManager Mouse
+		{
+			get; private set;
+		}
+		/// <summary>
+		///   Joystick manager.
+		/// </summary>
+		public JoystickManager Joystick
+		{
+			get; private set;
+		}
+
+		/// <summary>
+		///   Currently mapped actions.
+		/// </summary>
+		public ActionSet Actions
+		{
+			get; private set;
 		}
 
 		/// <summary>
@@ -173,6 +235,27 @@ namespace SFInput
 			return 0.0f;
 		}
 		/// <summary>
+		///   Gets the previous value of the given axis on the given device.
+		/// </summary>
+		/// <param name="dev">
+		///   The input device.
+		/// </param>
+		/// <param name="axis">
+		///   The axis to check.
+		/// </param>
+		/// <returns>
+		///   The previous value of the given axis on the given device if it is valid, otherwise 0.0f.
+		/// </returns>
+		public float GetLastAxis( InputDevice dev, string axis )
+		{
+			if( dev == InputDevice.Mouse )
+				return Mouse.GetLastAxis( axis );
+			else if( dev == InputDevice.Joystick )
+				return Joystick.GetLastAxis( 0, axis );
+
+			return 0.0f;
+		}
+		/// <summary>
 		///   Gets the delta value of the given axis on the given device.
 		/// </summary>
 		/// <param name="dev">
@@ -193,65 +276,108 @@ namespace SFInput
 
 			return 0.0f;
 		}
-
-		private Input()
+		/// <summary>
+		///   Checks if the given axis is pressed on the given device.
+		/// </summary>
+		/// <param name="dev">
+		///   The input device.
+		/// </param>
+		/// <param name="axis">
+		///   The axis to check.
+		/// </param>
+		/// <returns>
+		///   True if the axis is valid for the given device and is pressed, otherwise false.
+		/// </returns>
+		public bool IsAxisPressed( InputDevice dev, string axis )
 		{
-			Keyboard = new KeyboardManager();
-			Mouse    = new MouseManager();
-			Joystick = new JoystickManager();
-			Actions  = new ActionSet();
+			if( dev == InputDevice.Mouse )
+				return Mouse.IsAxisPressed( axis );
+			else if( dev == InputDevice.Joystick )
+				return Joystick.IsAxisPressed( 0, axis );
+
+			return false;
+		}
+		/// <summary>
+		///   Checks if the given axis has just been pressed on the given device.
+		/// </summary>
+		/// <param name="dev">
+		///   The input device.
+		/// </param>
+		/// <param name="axis">
+		///   The axis to check.
+		/// </param>
+		/// <returns>
+		///   True if the axis is valid for the given device and has just been pressed, otherwise false.
+		/// </returns>
+		public bool AxisJustPressed( InputDevice dev, string axis )
+		{
+			if( dev == InputDevice.Mouse )
+				return Mouse.AxisJustPressed( axis );
+			else if( dev == InputDevice.Joystick )
+				return Joystick.AxisJustPressed( 0, axis );
+
+			return false;
+		}
+		/// <summary>
+		///   Checks if the given axis has just been released on the given device.
+		/// </summary>
+		/// <param name="dev">
+		///   The input device.
+		/// </param>
+		/// <param name="axis">
+		///   The axis to check.
+		/// </param>
+		/// <returns>
+		///   True if the axis is valid for the given device and has just been released, otherwise false.
+		/// </returns>
+		public bool AxisJustReleased( InputDevice dev, string axis )
+		{
+			if( dev == InputDevice.Mouse )
+				return Mouse.AxisJustReleased( axis );
+			else if( dev == InputDevice.Joystick )
+				return Joystick.AxisJustReleased( 0, axis );
+
+			return false;
 		}
 
 		/// <summary>
-		///   The singleton input manager instance.
+		///   Checks if the input mapped to action is pressed.
 		/// </summary>
-		public static Input Manager
+		/// <param name="action">
+		///   The name of the mapped action.
+		/// </param>
+		/// <returns>
+		///   True if action is valid, mapped and pressed, otherwise false.
+		/// </returns>
+		public bool IsPressed( string action )
 		{
-			get
-			{
-				if( _instance == null )
-				{
-					lock( _syncRoot )
-					{
-						if( _instance == null )
-						{
-							_instance = new Input();
-						}
-					}
-				}
-
-				return _instance;
-			}
-		}
-
-		/// <summary>
-		///   Keyboard manager.
-		/// </summary>
-		public KeyboardManager Keyboard
-		{
-			get; private set;
+			return Actions.Get( action )?.IsPressed ?? false;
 		}
 		/// <summary>
-		///   Mouse manager.
+		///   Checks if the input mapped to action was just pressed.
 		/// </summary>
-		public MouseManager Mouse
+		/// <param name="action">
+		///   The name of the mapped action.
+		/// </param>
+		/// <returns>
+		///   True if action is valid, mapped and was just pressed, otherwise false.
+		/// </returns>
+		public bool JustPressed( string action )
 		{
-			get; private set;
+			return Actions.Get( action )?.JustPressed ?? false;
 		}
 		/// <summary>
-		///   Joystick manager.
+		///   Checks if the input mapped to action was just released.
 		/// </summary>
-		public JoystickManager Joystick
+		/// <param name="action">
+		///   The name of the mapped action.
+		/// </param>
+		/// <returns>
+		///   True if action is valid, mapped and was just released, otherwise false.
+		/// </returns>
+		public bool JustReleased( string action )
 		{
-			get; private set;
-		}
-
-		/// <summary>
-		///   Currently mapped actions.
-		/// </summary>
-		public ActionSet Actions
-		{
-			get; private set;
+			return Actions.Get( action )?.JustReleased ?? false;
 		}
 
 		/// <summary>

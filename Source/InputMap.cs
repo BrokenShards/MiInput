@@ -72,6 +72,36 @@ namespace SFInput
 	public class InputMap
 	{
 		/// <summary>
+		///   Checks if two input maps collide with eachother.
+		/// </summary>
+		/// <param name="m1">
+		///   The first input map.
+		/// </param>
+		/// <param name="m2">
+		///   The second input map.
+		/// </param>
+		/// <returns>
+		///   True if both input maps are valid and collide with eachother.
+		/// </returns>
+		public static bool Collides( InputMap m1, InputMap m2 )
+		{
+			if( m1 == null || !m1.IsValid || m2 == null || !m2.IsValid )
+				return false;
+
+			if( m1.Device == m2.Device && m1.Type == m2.Type )
+			{
+				string val1 = string.IsNullOrWhiteSpace( m1.Value )    ? null : m1.Value.ToLower(),
+				       neg1 = string.IsNullOrWhiteSpace( m1.Negative ) ? null : m1.Negative.ToLower(),
+					   val2 = string.IsNullOrWhiteSpace( m2.Value )    ? null : m2.Value.ToLower(),
+					   neg2 = string.IsNullOrWhiteSpace( m2.Negative ) ? null : m2.Negative.ToLower();
+
+				return ( val1 != null && val1 == neg2 ) || ( val2 != null && val2 == neg1 );
+			}
+
+			return false;
+		}
+
+		/// <summary>
 		///   Constructor.
 		/// </summary>
 		public InputMap()

@@ -98,7 +98,7 @@ namespace SFInput
 			return m_but[ (int)but ];
 		}
 		/// <summary>
-		///   If a given button was pressed on the last call to <see cref="Update"/>.
+		///   If a given button is pressed on the last call to <see cref="Update"/>.
 		/// </summary>
 		/// <param name="but">
 		///   The button to check.
@@ -112,6 +112,41 @@ namespace SFInput
 				return false;
 
 			return IsPressed( MouseManager.ToButton( but ).Value );
+		}
+
+		/// <summary>
+		///   If a given axis is classed as pressed on the last call to <see cref="Update"/>.
+		/// </summary>
+		/// <param name="axis">
+		///   The axis to check.
+		/// </param>
+		/// <returns>
+		///   True if the given axis is pressed and false otherwise.
+		/// </returns>
+		public bool IsAxisPressed( MouseAxis axis )
+		{
+			if( axis == MouseAxis.XPosition )
+				return Position.X >= Input.AxisPressThreshold;
+			else if( axis == MouseAxis.YPosition )
+				return Position.Y >= Input.AxisPressThreshold;
+
+			return false;
+		}
+		/// <summary>
+		///   If a given axis is pressed on the last call to <see cref="Update"/>.
+		/// </summary>
+		/// <param name="axis">
+		///   The axis to check.
+		/// </param>
+		/// <returns>
+		///   True if the given axis is pressed and false otherwise.
+		/// </returns>
+		public bool IsAxisPressed( string axis )
+		{
+			if( !MouseManager.IsAxis( axis ) )
+				return false;
+
+			return IsAxisPressed( MouseManager.ToAxis( axis ).Value );
 		}
 
 		private List<bool> m_but;

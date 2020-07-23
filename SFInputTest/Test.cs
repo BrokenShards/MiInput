@@ -113,13 +113,13 @@ namespace SFInputTest
 
 					Input.Manager.Update();
 
-					if( press == 0 && Input.Manager.Actions[ "test" ].Value > 0.5f )
+					if( press == 0 && Input.Manager.Actions[ "test" ].IsPressed )
 					{
 						Logger.Log( "Press A key." );
 						press++;
 					}
 
-					if( press == 1 && Input.Manager.Actions[ "test" ].Value < -0.5f )
+					if( press == 1 && Input.Manager.Actions[ "test" ].IsNegative )
 						press++;
 
 					if( press > 1 )

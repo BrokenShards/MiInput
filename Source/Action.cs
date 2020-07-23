@@ -38,9 +38,8 @@ namespace SFInput
 		/// </summary>
 		public Action()
 		{
-			Name           = string.Empty;
-			PressThreshold = 0.5f;
-			Inputs         = new List<InputMap>();
+			Name   = string.Empty;
+			Inputs = new List<InputMap>();
 		}
 		/// <summary>
 		///   Copy constructor.
@@ -50,9 +49,8 @@ namespace SFInput
 		/// </param>
 		public Action( Action a )
 		{
-			Name           = new string( a.Name.ToCharArray() );
-			PressThreshold = a.PressThreshold;
-			Inputs         = a.Inputs.Count > 0 ? new List<InputMap>( a.Inputs.Count ) : new List<InputMap>();
+			Name   = new string( a.Name.ToCharArray() );
+			Inputs = a.Inputs.Count > 0 ? new List<InputMap>( a.Inputs.Count ) : new List<InputMap>();
 
 			for( int i = 0; i < a.Inputs.Count; i++ )
 				Inputs[ i ] = new InputMap( a.Inputs[ i ] );
@@ -65,9 +63,8 @@ namespace SFInput
 		/// </param>
 		public Action( string name )
 		{
-			Name           = string.IsNullOrWhiteSpace( name ) ? string.Empty : name;
-			PressThreshold = 0.5f;
-			Inputs         = new List<InputMap>();
+			Name   = string.IsNullOrWhiteSpace( name ) ? string.Empty : name;
+			Inputs = new List<InputMap>();
 		}
 
 		/// <summary>
@@ -96,10 +93,7 @@ namespace SFInput
 			{
 				if( Inputs.Count == 0 )
 					return 0.0f;
-
-				bool pos = false;
-				bool neg = false;
-				
+								
 				for( int i = 0; i < Inputs.Count; i++ )
 				{
 					InputMap map = Inputs[ i ];
@@ -125,38 +119,112 @@ namespace SFInput
 							   ( map.Device == InputDevice.Mouse    ? Input.Manager.Mouse.IsPressed( Inputs[ i ].Negative ) :
 							   ( map.Device == InputDevice.Joystick ? Input.Manager.Joystick.IsPressed( 0, Inputs[ i ].Negative ) : false ) );
 
+						if( ( p && n ) || ( !p && !n ) )
+							continue;
+
 						if( map.Invert )
 						{
 							p = !p;
 							n = !n;
 						}
 
-						if( !pos && p )
-							pos = true;
-						if( !neg && n )
-							neg = true;
+						if( p )
+							return 1.0f;
+						if( n )
+							return -1.0f;
 					}
 				}
 
-				return pos && !neg ? 1.0f : ( neg && !pos ? -1.0f : 0.0f );
+				return 0.0f;
 			}
 		}
 
 		/// <summary>
-		///   If the mapped inputs are classed as pressed.
+		///   If the mapped inputs are classed as positive/pressed.
 		/// </summary>
-		public bool Pressed
+		public bool IsPositive
 		{
-			get { return Math.Abs( Value ) >= PressThreshold; }
+			get
+			{
+				return Value >= Input.AxisPressThreshold;
+			}
+		}
+		/// <summary>
+		///   If the mapped inputs are classed as negative.
+		/// </summary>
+		public bool IsNegative
+		{
+			get
+			{
+				return Value <= -Input.AxisPressThreshold;
+			}
 		}
 
 		/// <summary>
-		///   The minimum axis value before it registers as a button press.
+		///   If any of the mapped inputs are pressed.
 		/// </summary>
-		public float PressThreshold
+		public bool IsPressed
 		{
-			get { return m_threshold; }
-			set { m_threshold = value < 0.0f ? 0.0f : ( value > 1.0f ? 1.0f : value ); }
+			get
+			{
+				foreach( InputMap map in Inputs )
+				{
+					bool pos = false, 
+					     neg = false;
+
+					if( map.Type == InputType.Button )
+					{
+						pos = Input.Manager.IsPressed( map.Device, map.Value );
+						neg = Input.Manager.IsPressed( map.Device, map.Negative );
+					}
+					else if( map.Type == InputType.Axis )
+					{
+						float axis = Input.Manager.GetAxis( map.Device, map.Value );
+
+						pos = axis >= Input.AxisPressThreshold;
+						neg = axis <= -Input.AxisPressThreshold;
+					}
+
+					if( pos && !neg )
+						return true;
+					if( !pos && neg )
+						return false;
+				}
+
+				return false;
+			}
+		}
+		/// <summary>
+		///   If any of the mapped inputs were just pressed.
+		/// </summary>
+		public bool JustPressed
+		{
+			get
+			{
+				foreach( InputMap map in Inputs )
+				{
+					if( Input.Manager.JustPressed( map.Device, map.Value ) && !Input.Manager.JustPressed( map.Device, map.Negative ) )
+						return true;
+				}
+
+				return false;
+			}
+		}
+		/// <summary>
+		///   If any of the mapped inputs were just pressed.
+		/// </summary>
+		public bool JustReleased
+		{
+			get
+			{
+				foreach( InputMap map in Inputs )
+				{
+					if( Input.Manager.JustReleased( map.Device, map.Value ) && !Input.Manager.JustReleased( map.Device, map.Negative ) )
+						return true;
+				}
+
+				return false;
+			}
 		}
 
 		/// <summary>
@@ -189,15 +257,6 @@ namespace SFInput
 					return Logger.LogReturn( "Unable to load action; name either does not exist or is invalid.", false, LogType.Error );
 
 				Name = Naming.IsValid( name ) ? name : string.Empty;
-			}
-			// Threshold
-			{
-				string thresh = node.Attributes[ "threshold" ]?.Value?.Trim();
-
-				if( !float.TryParse( thresh, out float t ) )
-					return Logger.LogReturn( "Unable to load action; threshold either does not exist or is invalid.", false, LogType.Error );
-
-				PressThreshold = t;
 			}
 
 			// Inputs
@@ -247,8 +306,7 @@ namespace SFInput
 			for( uint i = 0; i < tab; i++ )
 				tabs += '\t';
 
-			sb.Append( tabs ); sb.Append( "<action name=\"" ); sb.Append( Name ); sb.Append( "\"\n" );
-			sb.Append( tabs ); sb.Append( "        threshold=\"" ); sb.Append( PressThreshold ); sb.Append( "\">\n" );
+			sb.Append( tabs ); sb.Append( "<action name=\"" ); sb.Append( Name ); sb.Append( "\">\n" );
 
 			foreach( InputMap p in Inputs )
 			{

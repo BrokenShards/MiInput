@@ -73,10 +73,6 @@
       <Project>{f0d47ddd-7b9e-40d7-bd38-b9b2636be6bd}</Project>
       <Name>SharpLogger</Name>
     </ProjectReference>
-    <ProjectReference Include="..\Dependencies\SharpSerial\SharpSerial.csproj">
-      <Project>{f8503691-7649-4e33-83e9-41c68d428198}</Project>
-      <Name>SharpSerial</Name>
-    </ProjectReference>
     <ProjectReference Include="..\SFInput.csproj">
       <Project>{0e738931-da83-48e2-9015-3ac423fb967a}</Project>
       <Name>SFInput</Name>

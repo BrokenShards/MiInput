@@ -4,6 +4,3 @@
 [submodule "Dependencies/SharpLogger"]
 	path = Dependencies/SharpLogger
 	url = https://github.com/ShardTheBroken/SharpLogger.git
-[submodule "Dependencies/SharpSerial"]
-	path = Dependencies/SharpSerial
-	url = https://github.com/ShardTheBroken/SharpSerial.git

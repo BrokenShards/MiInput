@@ -1,6 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <action_set>
-	<action name="horizontal" threshold="0.5">		
+	<action name="horizontal">		
 		<axis device="joystick"
 			  value="0"
 			  invert="false"/>
@@ -16,7 +16,7 @@
 				invert="false"/>
 	</action>
 
-	<action name="vertical" threshold="0.5">
+	<action name="vertical">
 		<axis device="joystick"
 			  value="1" 
 			  invert="false"/>
@@ -32,7 +32,7 @@
 		        invert="false"/>
 	</action>
 
-	<action name="submit" threshold="0.5">
+	<action name="submit">
 		<button device="keyboard"
 				positive="space"
 				negative="backspace"

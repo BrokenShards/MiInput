@@ -49,12 +49,15 @@ static class Program
 ```
 
 ## To Do
-- Implement XInput backend for joysticks and a way to switch on the fly.
+- Have actions assigned joystick inputs be able to convert XInput buttons and axies to SFML and back.
 
 ## Possibilities
 - Design a simple GUI application for creating/modifying action sets.
 
 ## Changelog
+### Version 0.2.0
+- Now XInput can be used for the joystick backend. This is enabled by default and can be changed on the fly.
+- Cleaned up API for less verbose usage. 
 
 ### Version 0.1.0
 - Initial release.

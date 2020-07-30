@@ -22,9 +22,52 @@
 
 using System;
 using SFML.Window;
+using SharpLogger;
+using XInputDotNetPure;
 
 namespace SFInput
 {
+	/// <summary>
+	///   Possible XInput device buttons.
+	/// </summary>
+	public enum XButtons
+	{
+		A,
+		B,
+		X,
+		Y,
+		Start,
+		Back,
+		Guide,
+		LB,
+		RB,
+		LT,
+		RT,
+		LS,
+		RS,
+		DPadUp,
+		DPadDown,
+		DPadLeft,
+		DPadRight,
+
+		COUNT
+	}
+	/// <summary>
+	///   Possible XInput device axies.
+	/// </summary>
+	public enum XAxis
+	{
+		LeftStickX,
+		LeftStickY,
+		RightStickX,
+		RightStickY,
+		LeftTrigger,
+		RightTrigger,
+		Triggers,
+
+		COUNT
+	}
+
 	/// <summary>
 	///   Represents the state of a single joystick at a given moment.
 	/// </summary>
@@ -35,7 +78,7 @@ namespace SFInput
 		/// </summary>
 		public JoystickState()
 		{
-			Player    = 0;
+			Player    = Input.Manager.Joystick.FirstConnected;
 			m_axies   = new float[ Joystick.AxisCount ];
 			m_buttons = new bool[ Joystick.ButtonCount ];
 
@@ -85,24 +128,24 @@ namespace SFInput
 		public uint Player
 		{
 			get { return m_player; }
-			set { m_player = value > Joystick.Count ? 0 : value; }
+			set { m_player = value >= Input.MaxJoysticks ? 0 : value; }
 		}
 
 		/// <summary>
 		///   Gets the state of the given axis.
 		/// </summary>
 		/// <param name="axis">
-		///   The axis.
+		///   The axis value.
 		/// </param>
 		/// <returns>
 		///   The state of the given axis when <see cref="Update"/> was last called.
 		/// </returns>
-		public float GetAxis( Joystick.Axis axis )
+		public float GetAxis( uint axis )
 		{
-			if( axis < 0 || (int)axis >= m_axies.Length )
+			if( axis < 0 || axis >= m_axies.Length )
 				return 0.0f;
 
-			return m_axies[ (int)axis ];
+			return m_axies[ axis ];
 		}
 		/// <summary>
 		///   Gets the state of the axis represented by the given string.
@@ -115,10 +158,12 @@ namespace SFInput
 		/// </returns>
 		public float GetAxis( string axis )
 		{
-			if( !JoystickManager.IsAxis( axis ) )
+			int a = JoystickManager.ToAxis( axis );
+
+			if( a < 0 )
 				return 0.0f;
 
-			return GetAxis( JoystickManager.ToAxis( axis ).Value );
+			return GetAxis( (uint)a );
 		}
 
 		/// <summary>
@@ -148,10 +193,12 @@ namespace SFInput
 		/// </returns>
 		public bool IsPressed( string but )
 		{
-			if( !JoystickManager.IsButton( but ) )
+			int b = JoystickManager.ToButton( but );
+
+			if( b < 0 )
 				return false;
 
-			return IsPressed( JoystickManager.ToButton( but ).Value );
+			return IsPressed( (uint)b );
 		}
 
 		/// <summary>
@@ -181,10 +228,12 @@ namespace SFInput
 		/// </returns>
 		public bool IsAxisPressed( string axis )
 		{
-			if( !JoystickManager.IsAxis( axis ) )
+			int a = JoystickManager.ToAxis( axis );
+
+			if( a < 0 )
 				return false;
 
-			return IsPressed( (uint)JoystickManager.ToAxis( axis ).Value );
+			return IsAxisPressed( (uint)a );
 		}
 
 		/// <summary>
@@ -192,21 +241,86 @@ namespace SFInput
 		/// </summary>
 		public void Update()
 		{
-			if( Joystick.IsConnected( Player ) )
-			{
-				for( int a = 0; a < m_axies.Length; a++ )
-					m_axies[ a ] = Joystick.HasAxis( Player, (Joystick.Axis)a ) ?
-								   Joystick.GetAxisPosition( Player, (Joystick.Axis)a ) : 0.0f;
+			if( Player >= Input.MaxJoysticks )
+				Player = 0;
 
-				for( uint b = 0; b < m_buttons.Length; b++ )
-					m_buttons[ b ] = Joystick.GetButtonCount( Player ) > b && Joystick.IsButtonPressed( Player, b );
+			if( !Input.Manager.Joystick.IsConnected( Player ) )
+				Player = Input.Manager.Joystick.FirstConnected;
+
+			if( Input.Manager.UseXInput )
+			{
+				GamePadState state = GamePad.GetState( (PlayerIndex)Player );
+
+				if( !state.IsConnected )
+				{
+					for( uint i = 0; i < Input.MaxJoysticks; i++ )
+					{
+						GamePadState s = GamePad.GetState( (PlayerIndex)i );
+
+						if( s.IsConnected )
+						{
+							Player = i;
+							state  = s;
+							break;
+						}
+						else if( i == Input.MaxJoysticks - 1 )
+						{
+							for( int a = 0; a < m_axies.Length; a++ )
+								m_axies[ a ] = 0.0f;
+							for( int b = 0; b < m_buttons.Length; b++ )
+								m_buttons[ b ] = false;
+
+							return;
+						}
+					}
+				}
+
+				m_axies[ (uint)XAxis.LeftStickX ]   = state.ThumbSticks.Left.X;
+				m_axies[ (uint)XAxis.LeftStickY ]   = state.ThumbSticks.Left.Y;
+				m_axies[ (uint)XAxis.RightStickX ]  = state.ThumbSticks.Right.X;
+				m_axies[ (uint)XAxis.RightStickY ]  = state.ThumbSticks.Right.Y;
+				m_axies[ (uint)XAxis.LeftTrigger ]  = state.Triggers.Left;
+				m_axies[ (uint)XAxis.RightTrigger ] = state.Triggers.Right;
+				m_axies[ (uint)XAxis.Triggers ]     = state.Triggers.Left - state.Triggers.Right;
+
+				m_buttons[ (uint)XButtons.A ]     = state.Buttons.A             == ButtonState.Pressed;
+				m_buttons[ (uint)XButtons.B ]     = state.Buttons.B             == ButtonState.Pressed;
+				m_buttons[ (uint)XButtons.Y ]     = state.Buttons.X             == ButtonState.Pressed;
+				m_buttons[ (uint)XButtons.X ]     = state.Buttons.Y             == ButtonState.Pressed;
+				m_buttons[ (uint)XButtons.Start ] = state.Buttons.Start         == ButtonState.Pressed;
+				m_buttons[ (uint)XButtons.Back ]  = state.Buttons.Back          == ButtonState.Pressed;
+				m_buttons[ (uint)XButtons.Guide ] = state.Buttons.Guide         == ButtonState.Pressed;
+				m_buttons[ (uint)XButtons.LB ]    = state.Buttons.LeftShoulder  == ButtonState.Pressed;
+				m_buttons[ (uint)XButtons.RB ]    = state.Buttons.RightShoulder == ButtonState.Pressed;
+				m_buttons[ (uint)XButtons.LS ]    = state.Buttons.LeftStick     == ButtonState.Pressed;
+				m_buttons[ (uint)XButtons.RS ]    = state.Buttons.RightStick    == ButtonState.Pressed;
+
+				m_buttons[ (uint)XButtons.LT ]    = state.Triggers.Left  >= Input.AxisPressThreshold;
+				m_buttons[ (uint)XButtons.RT ]    = state.Triggers.Right >= Input.AxisPressThreshold;
+
+				m_buttons[ (uint)XButtons.DPadUp ]    = state.DPad.Up    == ButtonState.Pressed;
+				m_buttons[ (uint)XButtons.DPadDown ]  = state.DPad.Down  == ButtonState.Pressed;
+				m_buttons[ (uint)XButtons.DPadLeft ]  = state.DPad.Left  == ButtonState.Pressed;
+				m_buttons[ (uint)XButtons.DPadRight ] = state.DPad.Right == ButtonState.Pressed;
 			}
 			else
 			{ 
-				for( int i = 0; i < m_axies.Length; i++ )
-					m_axies[ i ] = 0.0f;
-				for( int i = 0; i < m_buttons.Length; i++ )
-					m_buttons[ i ] = false;
+				if( Joystick.IsConnected( Player ) )
+				{
+					for( int a = 0; a < m_axies.Length; a++ )
+						m_axies[ a ] = Joystick.HasAxis( Player, (Joystick.Axis)a ) ?
+									   Joystick.GetAxisPosition( Player, (Joystick.Axis)a ) : 0.0f;
+
+					for( uint b = 0; b < m_buttons.Length; b++ )
+						m_buttons[ b ] = Joystick.GetButtonCount( Player ) > b && Joystick.IsButtonPressed( Player, b );
+				}
+				else
+				{
+					for( int i = 0; i < m_axies.Length; i++ )
+						m_axies[ i ] = 0.0f;
+					for( int i = 0; i < m_buttons.Length; i++ )
+						m_buttons[ i ] = false;
+				}
 			}
 		}
 

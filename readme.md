@@ -48,6 +48,12 @@ static class Program
 
 ```
 
+## To Do
+- Implement XInput backend for joysticks and a way to switch on the fly.
+
+## Possibilities
+- Design a simple GUI application for creating/modifying action sets.
+
 ## Changelog
 
 ### Version 0.1.0

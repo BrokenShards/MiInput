@@ -53,9 +53,9 @@ namespace SFInputTest
 		}
 
 		static bool ActionTest()
-		{ 
+		{
 			Action act = new Action( "test" );
-			act.Inputs.Add( new InputMap( InputDevice.Keyboard, InputType.Button, "K" ) );
+			act.Inputs.Add( new InputMap( InputDevice.Joystick, InputType.Button, "0", "1" ) );
 
 			if( !Input.Manager.Actions.Add( act ) )
 				return Logger.LogReturn( "Unable to add valid action to action set.", false, LogType.Error );
@@ -93,15 +93,18 @@ namespace SFInputTest
 
 		static bool WindowTest()
 		{
+			Input.Manager.UseXInput = true;
+			Input.Manager.Update();
+
 			Action test = new Action( "test" );
-			test.Inputs.Add( new InputMap( InputDevice.Keyboard, InputType.Button, "D", "A" ) );
+			test.Inputs.Add( new InputMap( InputDevice.Joystick, InputType.Button, "A", "B" ) );
 
 			if( !Input.Manager.Actions.Add( test, true ) )
 				return Logger.LogReturn( "Unable to add test action to input manager.", false, LogType.Error );
 
 			uint press = 0;
 
-			Logger.Log( "Press D key." );
+			Logger.Log( "Press A Button." );
 
 			using( RenderWindow window = new RenderWindow( new VideoMode( 640, 480 ), "SFInput Test", Styles.Close ) )
 			{
@@ -115,7 +118,7 @@ namespace SFInputTest
 
 					if( press == 0 && Input.Manager.Actions[ "test" ].IsPressed )
 					{
-						Logger.Log( "Press A key." );
+						Logger.Log( "Press B button." );
 						press++;
 					}
 

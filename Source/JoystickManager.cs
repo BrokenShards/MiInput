@@ -22,6 +22,7 @@
 
 using System;
 using SFML.Window;
+using XInputDotNetPure;
 
 namespace SFInput
 {
@@ -47,8 +48,16 @@ namespace SFInput
 			if( string.IsNullOrEmpty( val ) )
 				return false;
 
-			if( !uint.TryParse( val, out uint b ) || b >= Joystick.ButtonCount )
-				return false;
+			if( Input.Manager.UseXInput )
+			{
+				if( !Enum.TryParse( val, true, out XButtons xb ) && ( !uint.TryParse( val, out uint b ) || b >= (uint)XButtons.COUNT ) )
+					return false;
+			}
+			else
+			{
+				if( !uint.TryParse( val, out uint b ) || b >= Joystick.ButtonCount )
+					return false;
+			}
 
 			return true;
 		}
@@ -59,18 +68,40 @@ namespace SFInput
 		///   The string to parse.
 		/// </param>
 		/// <returns>
-		///   The joystick button parsed from the string on success or null on failure.
+		///   The joystick button parsed from the string on success or -1 on failure.
 		/// </returns>
-		public static uint? ToButton( string val )
+		public static int ToButton( string val )
 		{
 			if( !IsButton( val ) )
-				return null;
+				return -1;
 
-			return uint.Parse( val );
+			if( Input.Manager.UseXInput && Enum.TryParse( val, true, out XButtons xb ) )
+				return (int)xb;
+
+			uint count = Input.Manager.UseXInput ? (uint)XButtons.COUNT : Joystick.ButtonCount;
+
+			if( uint.TryParse( val, out uint b ) && b < count )
+				return (int)b;
+
+			return -1;
 		}
+
 
 		/// <summary>
 		///   Checks if the given string represents a valid axis.
+		/// </summary>
+		/// <param name="val">
+		///   The string to check.
+		/// </param>
+		/// <returns>
+		///   True if the given string represents a valid joystick axis and false otherwise.
+		/// </returns>
+		public static bool IsAxis( string val )
+		{
+			return Input.Manager.UseXInput ? IsXAxis( val ) : IsSAxis( val );
+		}
+		/// <summary>
+		///   Checks if the given string represents a valid SFML axis.
 		/// </summary>
 		/// <remarks>
 		///   A valid axis string is either a case-insensitive <see cref="Joystick.Axis"/> name or value.
@@ -81,7 +112,7 @@ namespace SFInput
 		/// <returns>
 		///   True if the given string represents a valid joystick axis and false otherwise.
 		/// </returns>
-		public static bool IsAxis( string val )
+		private static bool IsSAxis( string val )
 		{
 			if( string.IsNullOrEmpty( val ) )
 				return false;
@@ -100,38 +131,77 @@ namespace SFInput
 			return true;
 		}
 		/// <summary>
-		///   Parses the given string to its joystick axis representation.
+		///   Checks if the given string represents a valid XInput axis.
+		/// </summary>
+		/// <remarks>
+		///   A valid axis string is either a case-insensitive <see cref="XAxis"/> name or value.
+		/// </remarks>
+		/// <param name="val">
+		///   The string to check.
+		/// </param>
+		/// <returns>
+		///   True if the given string represents a valid joystick axis and false otherwise.
+		/// </returns>
+		private static bool IsXAxis( string val )
+		{
+			if( string.IsNullOrEmpty( val ) )
+				return false;
+
+			if( !Enum.TryParse( val, true, out XAxis ax ) )
+			{
+				if( uint.TryParse( val, out uint b ) )
+				{
+					if( b >= (uint)XAxis.COUNT )
+						return false;
+				}
+				else
+					return false;
+			}
+
+			return true;
+		}
+
+		/// <summary>
+		///   Parses the given string to its joystick axis value.
 		/// </summary>
 		/// <param name="val">
 		///   The string to parse.
 		/// </param>
 		/// <returns>
-		///   The joystick axis parsed from the string on success or null on failure.
+		///   The joystick axis value parsed from the string on success or -1 on failure.
 		/// </returns>
-		public static Joystick.Axis? ToAxis( string val )
+		public static int ToAxis( string val )
 		{
-			if( !IsAxis( val ) )
-				return null;
+			if( Input.Manager.UseXInput )
+			{
+				if( Enum.TryParse( val, true, out XAxis ax ) )
+					return (int)ax;
+				else if( uint.TryParse( val, out uint a ) && a < (uint)XAxis.COUNT )
+					return (int)a;
+			}
+			else
+			{
+				if( Enum.TryParse( val, true, out Joystick.Axis ax ) )
+					return (int)ax;
+				else if( uint.TryParse( val, out uint a ) && a < Joystick.AxisCount )
+					return (int)a;
+			}
 
-			if( !Enum.TryParse( val, true, out Joystick.Axis ax ) )
-				return (Joystick.Axis)uint.Parse( val );
-
-			return ax;
+			return -1;
 		}
-
 
 		/// <summary>
 		///   Constructs the instance.
 		/// </summary>
 		public JoystickManager()
 		{
-			m_current = new JoystickState[ Joystick.Count ];
-			m_last    = new JoystickState[ Joystick.Count ];
+			m_current = new JoystickState[ Input.MaxJoysticks ];
+			m_last = new JoystickState[ Input.MaxJoysticks ];
 
-			for( uint i = 0; i < Joystick.Count; i++ )
+			for( uint i = 0; i < Input.MaxJoysticks; i++ )
 			{
 				m_current[ i ] = new JoystickState( i );
-				m_last[ i ]    = new JoystickState( i );
+				m_last[ i ] = new JoystickState( i );
 			}
 		}
 
@@ -146,10 +216,41 @@ namespace SFInput
 		/// </returns>
 		public bool IsConnected( uint joystick )
 		{
-			if( joystick >= Joystick.Count )
+			if( joystick >= Input.MaxJoysticks )
 				return false;
 
+			if( Input.Manager.UseXInput )
+				return GamePad.GetState( (PlayerIndex)joystick ).IsConnected;
+
 			return Joystick.IsConnected( joystick );
+		}
+
+		/// <summary>
+		///   The first connected joystick.
+		/// </summary>
+		public uint FirstConnected
+		{
+			get
+			{
+				if( Input.Manager.UseXInput )
+				{
+					for( uint i = 0; i < Input.MaxJoysticks; i++ )
+					{
+						GamePadState state = GamePad.GetState( (PlayerIndex)i );
+
+						if( state.IsConnected )
+							return i;
+					}
+				}
+				else
+				{
+					for( uint i = 0; i < Input.MaxJoysticks; i++ )
+						if( Joystick.IsConnected( i ) )
+							return i;
+				}
+
+				return Input.MaxJoysticks;
+			}
 		}
 
 		/// <summary>
@@ -157,7 +258,7 @@ namespace SFInput
 		/// </summary>
 		public void Update()
 		{
-			for( uint i = 0; i < Joystick.Count; i++ )
+			for( uint i = 0; i < Input.MaxJoysticks; i++ )
 			{
 				m_last[ i ] = new JoystickState( m_current[ i ] );
 				m_current[ i ].Update();
@@ -178,7 +279,7 @@ namespace SFInput
 		/// </returns>
 		public bool IsPressed( uint joystick, uint but )
 		{
-			if( joystick >= Joystick.Count )
+			if( joystick >= Input.MaxJoysticks )
 				return false;
 
 			return m_current[ joystick ].IsPressed( but );
@@ -197,7 +298,7 @@ namespace SFInput
 		/// </returns>
 		public bool IsPressed( uint joystick, string but )
 		{
-			if( joystick >= Joystick.Count )
+			if( joystick >= Input.MaxJoysticks )
 				return false;
 
 			return m_current[ joystick ].IsPressed( but );
@@ -216,7 +317,7 @@ namespace SFInput
 		/// </returns>
 		public bool JustPressed( uint joystick, uint but )
 		{
-			if( joystick >= Joystick.Count )
+			if( joystick >= Input.MaxJoysticks )
 				return false;
 
 			return m_current[ joystick ].IsPressed( but ) && !m_last[ joystick ].IsPressed( but );
@@ -235,7 +336,7 @@ namespace SFInput
 		/// </returns>
 		public bool JustPressed( uint joystick, string but )
 		{
-			if( joystick >= Joystick.Count )
+			if( joystick >= Input.MaxJoysticks )
 				return false;
 
 			return m_current[ joystick ].IsPressed( but ) && !m_last[ joystick ].IsPressed( but );
@@ -254,7 +355,7 @@ namespace SFInput
 		/// </returns>
 		public bool JustReleased( uint joystick, uint but )
 		{
-			if( joystick >= Joystick.Count )
+			if( joystick >= Input.MaxJoysticks )
 				return false;
 
 			return ( !m_current[ joystick ].IsPressed( but ) && m_last[ joystick ].IsPressed( but ) );
@@ -273,7 +374,7 @@ namespace SFInput
 		/// </returns>
 		public bool JustReleased( uint joystick, string but )
 		{
-			if( joystick >= Joystick.Count )
+			if( joystick >= Input.MaxJoysticks )
 				return false;
 
 			return ( !m_current[ joystick ].IsPressed( but ) && m_last[ joystick ].IsPressed( but ) );
@@ -292,9 +393,11 @@ namespace SFInput
 		///   The value of the given axis from the given joystick player index. Will also return zero if 
 		///   <paramref name="axis"/> or <paramref name="joystick"/> are out of range or not connected.
 		/// </returns>
-		public float GetAxis( uint joystick, Joystick.Axis axis )
+		public float GetAxis( uint joystick, uint axis )
 		{
-			if( axis < 0 || (uint)axis >= Joystick.AxisCount || joystick >= Joystick.Count || !IsConnected( joystick ) )
+			uint count = Input.Manager.UseXInput ? (uint)XAxis.COUNT : Joystick.AxisCount;
+
+			if( axis >= count || joystick >= Input.MaxJoysticks )
 				return 0.0f;
 
 			return m_current[ joystick ].GetAxis( axis );
@@ -314,7 +417,7 @@ namespace SFInput
 		/// </returns>
 		public float GetAxis( uint joystick, string axis )
 		{
-			if( joystick >= Joystick.Count || !IsConnected( joystick ) )
+			if( joystick >= Input.MaxJoysticks || !IsConnected( joystick ) )
 				return 0.0f;
 
 			return m_current[ joystick ].GetAxis( axis );
@@ -333,9 +436,11 @@ namespace SFInput
 		///   The previous value of the given axis from the given joystick player index. Will also return zero if 
 		///   <paramref name="axis"/> or <paramref name="joystick"/> are out of range or not connected.
 		/// </returns>
-		public float GetLastAxis( uint joystick, Joystick.Axis axis )
+		public float GetLastAxis( uint joystick, uint axis )
 		{
-			if( axis < 0 || (uint)axis >= Joystick.AxisCount || joystick >= Joystick.Count || !IsConnected( joystick ) )
+			uint count = Input.Manager.UseXInput ? (uint)XAxis.COUNT : Joystick.AxisCount;
+
+			if( axis >= count || joystick >= Input.MaxJoysticks )
 				return 0.0f;
 
 			return m_last?[ joystick ]?.GetAxis( axis ) ?? 0.0f;
@@ -355,7 +460,7 @@ namespace SFInput
 		/// </returns>
 		public float GetLastAxis( uint joystick, string axis )
 		{
-			if( joystick >= Joystick.Count || !IsConnected( joystick ) )
+			if( joystick >= Input.MaxJoysticks || !IsConnected( joystick ) )
 				return 0.0f;
 
 			return m_last?[ joystick ]?.GetAxis( axis ) ?? 0.0f;
@@ -376,12 +481,9 @@ namespace SFInput
 		///   index. Will also return zero if <paramref name="axis"/> or <paramref name="joystick"/> are out of range
 		///   or not connected.
 		/// </returns>
-		public float GetAxisDelta( uint joystick, Joystick.Axis axis )
+		public float GetAxisDelta( uint joystick, uint axis )
 		{
-			if( axis < 0 || (uint)axis >= Joystick.AxisCount || joystick >= Joystick.Count || !IsConnected( joystick ) )
-				return 0.0f;
-
-			return m_current[ joystick ].GetAxis( axis ) - m_last[ joystick ].GetAxis( axis );
+			return GetAxis( joystick, axis ) - GetLastAxis( joystick, axis );
 		}
 		/// <summary>
 		///   Gets the difference in value between the last two update calls of the given axis from the given joystick
@@ -400,10 +502,7 @@ namespace SFInput
 		/// </returns>
 		public float GetAxisDelta( uint joystick, string axis )
 		{
-			if( joystick >= Joystick.Count || !IsConnected( joystick ) )
-				return 0.0f;
-
-			return m_current[ joystick ].GetAxis( axis ) - m_last[ joystick ].GetAxis( axis );
+			return GetAxis( joystick, axis ) - GetLastAxis( joystick, axis );
 		}
 
 		/// <summary>
@@ -420,7 +519,7 @@ namespace SFInput
 		/// </returns>
 		public bool IsAxisPressed( uint joystick, uint axis )
 		{
-			if( joystick >= Joystick.Count )
+			if( joystick >= Input.MaxJoysticks )
 				return false;
 
 			return m_current[ joystick ].IsAxisPressed( axis );
@@ -439,7 +538,7 @@ namespace SFInput
 		/// </returns>
 		public bool IsAxisPressed( uint joystick, string axis )
 		{
-			if( joystick >= Joystick.Count )
+			if( joystick >= Input.MaxJoysticks )
 				return false;
 
 			return m_current[ joystick ].IsAxisPressed( axis );
@@ -458,10 +557,10 @@ namespace SFInput
 		/// </returns>
 		public bool AxisJustPressed( uint joystick, uint axis )
 		{
-			if( joystick >= Joystick.Count )
+			if( joystick >= Input.MaxJoysticks )
 				return false;
 
-			return m_current[ joystick ].IsAxisPressed( axis ) && !m_last[ joystick ].IsAxisPressed( axis );
+			return m_current[ joystick ].IsAxisPressed( axis ) && !( m_last?[ joystick ]?.IsAxisPressed( axis ) ?? false );
 		}
 		/// <summary>
 		///   Check if the given axis was just pressed.
@@ -477,10 +576,10 @@ namespace SFInput
 		/// </returns>
 		public bool AxisJustPressed( uint joystick, string axis )
 		{
-			if( joystick >= Joystick.Count )
+			if( joystick >= Input.MaxJoysticks )
 				return false;
 
-			return m_current[ joystick ].IsAxisPressed( axis ) && !m_last[ joystick ].IsAxisPressed( axis );
+			return m_current[ joystick ].IsAxisPressed( axis ) && !( m_last?[ joystick ]?.IsAxisPressed( axis ) ?? false );
 		}
 		/// <summary>
 		///   Check if the given axis was just released.
@@ -496,10 +595,10 @@ namespace SFInput
 		/// </returns>
 		public bool AxisJustReleased( uint joystick, uint axis )
 		{
-			if( joystick >= Joystick.Count )
+			if( joystick >= Input.MaxJoysticks )
 				return false;
 
-			return !m_current[ joystick ].IsAxisPressed( axis ) && m_last[ joystick ].IsAxisPressed( axis );
+			return !m_current[ joystick ].IsAxisPressed( axis ) && ( m_last?[ joystick ]?.IsAxisPressed( axis ) ?? false );
 		}
 		/// <summary>
 		///   Check if the given axis was just released.
@@ -515,10 +614,10 @@ namespace SFInput
 		/// </returns>
 		public bool AxisJustReleased( uint joystick, string axis )
 		{
-			if( joystick >= Joystick.Count )
+			if( joystick >= Input.MaxJoysticks )
 				return false;
 
-			return !m_current[ joystick ].IsAxisPressed( axis ) && m_last[ joystick ].IsAxisPressed( axis );
+			return !m_current[ joystick ].IsAxisPressed( axis ) && ( m_last?[ joystick ]?.IsAxisPressed( axis ) ?? false );
 		}
 
 		private JoystickState[] m_current,

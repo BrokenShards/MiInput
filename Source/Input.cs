@@ -31,6 +31,7 @@ namespace SFInput
 	/// </summary>
 	public class Input
 	{
+		public const uint  MaxJoysticks = 4;
 		public const float AxisPressThreshold = 0.4f;
 
 		/// <summary>
@@ -85,10 +86,11 @@ namespace SFInput
 
 		private Input()
 		{
-			Keyboard = new KeyboardManager();
-			Mouse    = new MouseManager();
-			Joystick = new JoystickManager();
-			Actions  = new ActionSet();
+			Keyboard  = new KeyboardManager();
+			Mouse     = new MouseManager();
+			Joystick  = new JoystickManager();
+			Actions   = new ActionSet();
+			UseXInput = false;
 		}
 
 		/// <summary>
@@ -133,6 +135,14 @@ namespace SFInput
 		public JoystickManager Joystick
 		{
 			get; private set;
+		}
+
+		/// <summary>
+		///   If XInput should be used for joystick/controller input.
+		/// </summary>
+		public bool UseXInput
+		{
+			get; set;
 		}
 
 		/// <summary>

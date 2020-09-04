@@ -194,7 +194,7 @@ namespace SFInput
 					}
 					else if( Type == InputType.Button )
 					{
-						if( ( !string.IsNullOrWhiteSpace( Value )    && !JoystickManager.IsButton( Value ) ) ||
+						if( ( !string.IsNullOrWhiteSpace( Value ) && !JoystickManager.IsButton( Value ) ) ||
 							( !string.IsNullOrWhiteSpace( Negative ) && !JoystickManager.IsButton( Negative ) ) )
 							return false;
 					}

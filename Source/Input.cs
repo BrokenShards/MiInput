@@ -86,11 +86,13 @@ namespace SFInput
 
 		private Input()
 		{
-			Keyboard  = new KeyboardManager();
-			Mouse     = new MouseManager();
-			Joystick  = new JoystickManager();
-			Actions   = new ActionSet();
-			UseXInput = false;
+			Keyboard = new KeyboardManager();
+			Mouse    = new MouseManager();
+			Joystick = new JoystickManager[ MaxJoysticks ];
+			Actions  = new ActionSet();
+
+			for( uint i = 0; i < MaxJoysticks; i++ )
+				Joystick[ i ] = new JoystickManager( i );
 		}
 
 		/// <summary>
@@ -129,28 +131,43 @@ namespace SFInput
 		{
 			get; private set;
 		}
+
 		/// <summary>
-		///   Joystick manager.
+		///   Array of joystick managers for each player.
 		/// </summary>
-		public JoystickManager Joystick
+		public JoystickManager[] Joystick
 		{
 			get; private set;
 		}
 
-		/// <summary>
-		///   If XInput should be used for joystick/controller input.
-		/// </summary>
-		public bool UseXInput
+		public uint FirstJoystick
 		{
-			get; set;
+			get { return Joystick[ 0 ].FirstConnected; }
 		}
-
+		
 		/// <summary>
 		///   Currently mapped actions.
 		/// </summary>
 		public ActionSet Actions
 		{
 			get; private set;
+		}
+
+		/// <summary>
+		///   If the joystick at the given index is connected.
+		/// </summary>
+		/// <param name="player">
+		///   The player index of the joystick.
+		/// </param>
+		/// <returns>
+		///   True if the joystick is connected and false otherwise.
+		/// </returns>
+		public bool JoystickConnected( uint player )
+		{
+			if( player >= MaxJoysticks )
+				return false;
+
+			return Joystick[ player ].IsConnected;
 		}
 
 		/// <summary>
@@ -172,7 +189,12 @@ namespace SFInput
 			else if( dev == InputDevice.Mouse )
 				return Mouse.IsPressed( but );
 			else if( dev == InputDevice.Joystick )
-				return Joystick.IsPressed( 0, but );
+			{
+				uint first = FirstJoystick;
+
+				if( first < MaxJoysticks )
+					return Joystick[ first ].IsPressed( but );
+			}
 
 			return false;
 		}
@@ -195,7 +217,12 @@ namespace SFInput
 			else if( dev == InputDevice.Mouse )
 				return Mouse.JustPressed( but );
 			else if( dev == InputDevice.Joystick )
-				return Joystick.JustPressed( 0, but );
+			{
+				uint first = FirstJoystick;
+
+				if( first < MaxJoysticks )
+					return Joystick[ first ].JustPressed( but );
+			}
 
 			return false;
 		}
@@ -218,7 +245,12 @@ namespace SFInput
 			else if( dev == InputDevice.Mouse )
 				return Mouse.JustReleased( but );
 			else if( dev == InputDevice.Joystick )
-				return Joystick.JustReleased( 0, but );
+			{
+				uint first = FirstJoystick;
+
+				if( first < MaxJoysticks )
+					return Joystick[ first ].JustReleased( but );
+			}
 
 			return false;
 		}
@@ -240,7 +272,12 @@ namespace SFInput
 			if( dev == InputDevice.Mouse )
 				return Mouse.GetAxis( axis );
 			else if( dev == InputDevice.Joystick )
-				return Joystick.GetAxis( 0, axis );
+			{
+				uint first = FirstJoystick;
+
+				if( first < MaxJoysticks )
+					return Joystick[ first ].GetAxis( axis );
+			}
 
 			return 0.0f;
 		}
@@ -261,7 +298,12 @@ namespace SFInput
 			if( dev == InputDevice.Mouse )
 				return Mouse.GetLastAxis( axis );
 			else if( dev == InputDevice.Joystick )
-				return Joystick.GetLastAxis( 0, axis );
+			{
+				uint first = FirstJoystick;
+
+				if( first < MaxJoysticks )
+					return Joystick[ first ].GetLastAxis( axis );
+			}
 
 			return 0.0f;
 		}
@@ -277,12 +319,17 @@ namespace SFInput
 		/// <returns>
 		///   The delta value of the given axis on the given device if it is valid, otherwise 0.0f.
 		/// </returns>
-		public float AxisDelta( InputDevice dev, string axis )
+		public float GetAxisDelta( InputDevice dev, string axis )
 		{
 			if( dev == InputDevice.Mouse )
-				return Mouse.GetAxisDelta( axis );
+				return Mouse.AxisDelta( axis );
 			else if( dev == InputDevice.Joystick )
-				return Joystick.GetAxisDelta( 0, axis );
+			{
+				uint first = FirstJoystick;
+
+				if( first < MaxJoysticks )
+					return Joystick[ first ].AxisDelta( axis );
+			}
 
 			return 0.0f;
 		}
@@ -298,12 +345,17 @@ namespace SFInput
 		/// <returns>
 		///   True if the axis is valid for the given device and is pressed, otherwise false.
 		/// </returns>
-		public bool IsAxisPressed( InputDevice dev, string axis )
+		public bool AxisIsPressed( InputDevice dev, string axis )
 		{
 			if( dev == InputDevice.Mouse )
-				return Mouse.IsAxisPressed( axis );
+				return Mouse.AxisIsPressed( axis );
 			else if( dev == InputDevice.Joystick )
-				return Joystick.IsAxisPressed( 0, axis );
+			{
+				uint first = FirstJoystick;
+
+				if( first < MaxJoysticks )
+					return Joystick[ first ].AxisIsPressed( axis );
+			}
 
 			return false;
 		}
@@ -324,7 +376,12 @@ namespace SFInput
 			if( dev == InputDevice.Mouse )
 				return Mouse.AxisJustPressed( axis );
 			else if( dev == InputDevice.Joystick )
-				return Joystick.AxisJustPressed( 0, axis );
+			{
+				uint first = FirstJoystick;
+
+				if( first < MaxJoysticks )
+					return Joystick[ first ].AxisJustPressed( axis );
+			}
 
 			return false;
 		}
@@ -345,7 +402,12 @@ namespace SFInput
 			if( dev == InputDevice.Mouse )
 				return Mouse.AxisJustReleased( axis );
 			else if( dev == InputDevice.Joystick )
-				return Joystick.AxisJustReleased( 0, axis );
+			{
+				uint first = FirstJoystick;
+
+				if( first < MaxJoysticks )
+					return Joystick[ first ].AxisJustReleased( axis );
+			}
 
 			return false;
 		}
@@ -397,7 +459,12 @@ namespace SFInput
 		{
 			Keyboard.Update();
 			Mouse.Update();
-			Joystick.Update();
+
+			for( uint i = 0; i < MaxJoysticks; i++ )
+			{
+				Joystick[ i ].Player = i;
+				Joystick[ i ].Update();
+			}
 		}
 		
 		/// <summary>

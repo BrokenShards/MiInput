@@ -21,7 +21,6 @@
 ////////////////////////////////////////////////////////////////////////////////
 
 using System;
-using System.Collections.Generic;
 using SFML.Window;
 
 namespace SFInput
@@ -29,19 +28,17 @@ namespace SFInput
 	/// <summary>
 	///   Represents the state of the keyboard at a given moment.
 	/// </summary>
-	public class KeyboardState
+	public class KeyboardState : ICloneable
 	{
+		public const uint KeyCount = (uint)Keyboard.Key.KeyCount;
+		
 		/// <summary>
 		///   Construct a new state.
 		/// </summary>
 		public KeyboardState()
 		{
-			int count = (int)Keyboard.Key.KeyCount;
-
-			m_key = new List<bool>( count );
-
-			for( int i = 0; i < count; i++ )
-				m_key.Add( false );
+			m_keys = new bool[ KeyCount ];
+			Reset();
 		}
 		/// <summary>
 		///   Construct a new state by copying from another instance.
@@ -54,56 +51,85 @@ namespace SFInput
 		/// </exception>
 		public KeyboardState( KeyboardState state )
 		{
-			if( state == null )
-				throw new ArgumentNullException();
+			m_keys = new bool[ KeyCount ];
 
-			m_key = new List<bool>( state.m_key );
+			for( int i = 0; i < KeyCount; i++ )
+				m_keys[ i ] = state.m_keys[ i ];
 		}
 
 		/// <summary>
-		///   Update to the current state of the keyboard.
+		///   Updates the object to the current state of the device.
 		/// </summary>
 		public void Update()
 		{
-			for( int i = 0; i < m_key.Count; i++ )
-				m_key[ i ] = Keyboard.IsKeyPressed( (Keyboard.Key)i );					
+			for( int i = 0; i < KeyCount; i++ )
+				m_keys[ i ] = Keyboard.IsKeyPressed( (Keyboard.Key)i );					
 		}
 
 		/// <summary>
-		///   If a given key was pressed on the last call to <see cref="Update"/>.
+		///   Reset state values.
+		/// </summary>
+		public virtual void Reset()
+		{
+			if( m_keys != null )
+				for( uint i = 0; i < KeyCount; i++ )
+					m_keys[ i ] = false;
+		}
+
+		/// <summary>
+		///   If the key is pressed.
+		/// </summary>
+		/// <param name="key">
+		///   The index of the key.
+		/// </param>
+		/// <returns>
+		///   True if the key index is within range and the key is pressed, otherwise false.
+		/// </returns>
+		public bool IsPressed( uint key )
+		{
+			if( key >= KeyCount )
+				return false;
+
+			return m_keys[ key ];
+		}
+		/// <summary>
+		///   If the key is pressed.
 		/// </summary>
 		/// <param name="key">
 		///   The key to check.
 		/// </param>
 		/// <returns>
-		///   True if the given key is pressed and false otherwise.
+		///   True if the key is within range and is pressed, otherwise false.
 		/// </returns>
 		public bool IsPressed( Keyboard.Key key )
 		{
 			if( key < 0 || key >= Keyboard.Key.KeyCount )
 				return false;
 
-			return m_key[ (int)key ];
+			return IsPressed( (uint)key );
 		}
-
 		/// <summary>
-		///   If a given key was pressed on the last call to <see cref="Update"/>.
+		///   If the key with the given name is pressed.
 		/// </summary>
 		/// <param name="key">
-		///   The name of the key to check.
+		///   The name of the key.
 		/// </param>
 		/// <returns>
-		///   True if the given key is pressed and false otherwise.
+		///   True if the key name is valid and the key is pressed, otherwise false.
 		/// </returns>
 		public bool IsPressed( string key )
 		{
 			if( !KeyboardManager.IsKey( key ) )
 				return false;
 
-			return IsPressed( KeyboardManager.ToKey( key ).Value );
+			return IsPressed( (uint)KeyboardManager.ToKey( key ) );
 		}
 
+		public object Clone()
+		{
+			return new KeyboardState( this );
+		}
 
-		private List<bool> m_key;
+		private bool[] m_keys;
 	}
 }

@@ -33,12 +33,14 @@ namespace SFInput
 	{
 		XPosition,
 		YPosition,
+
+		COUNT
 	}
 
 	/// <summary>
 	///   Manages the state of the Mouse.
 	/// </summary>
-	public sealed class MouseManager
+	public class MouseManager
 	{
 		/// <summary>
 		///   Checks if the given string represents a valid button.
@@ -77,17 +79,16 @@ namespace SFInput
 		///   The string to parse.
 		/// </param>
 		/// <returns>
-		///   The mouse button parsed from the string on success or null on failure.
+		///   The mouse button parsed from the string on success or ButtonCount on failure.
 		/// </returns>
-		public static Mouse.Button? ToButton( string val )
+		public static Mouse.Button ToButton( string val )
 		{
-			if( !IsButton( val ) )
-				return null;
+			if( Enum.TryParse( val, true, out Mouse.Button but ) )
+				return but;
+			if( uint.TryParse( val, out uint b ) && b < (uint)Mouse.Button.ButtonCount )
+				return (Mouse.Button)b;
 
-			if( !Enum.TryParse( val, true, out Mouse.Button but ) )
-				return (Mouse.Button)uint.Parse( val );
-
-			return but;
+			return Mouse.Button.ButtonCount;
 		}
 
 		/// <summary>
@@ -127,36 +128,50 @@ namespace SFInput
 		///   The string to parse.
 		/// </param>
 		/// <returns>
-		///   The mouse axis parsed from the string on success or null on failure.
+		///   The mouse axis parsed from the string on success or MouseAxis.COUNT on failure.
 		/// </returns>
-		public static MouseAxis? ToAxis( string val )
+		public static MouseAxis ToAxis( string val )
 		{
-			if( !IsAxis( val ) )
-				return null;
+			if( Enum.TryParse( val, true, out MouseAxis ax ) )
+				return ax;
+			if( uint.TryParse( val, out uint a ) && a < (uint)MouseAxis.COUNT )
+				return (MouseAxis)a;
 
-			if( !Enum.TryParse( val, true, out MouseAxis ax ) )
-				return (MouseAxis)uint.Parse( val );
-
-			return ax;
+			return MouseAxis.COUNT;
 		}
 
-
 		/// <summary>
-		///   Constructs the instance.
+		///   Constructor.
 		/// </summary>
 		public MouseManager()
 		{
-			m_current   = new MouseState();
-			m_last      = new MouseState();
+			m_last    = new MouseState();
+			m_current = new MouseState();
+		}
+		/// <summary>
+		///   Copy constructor.
+		/// </summary>
+		public MouseManager( MouseManager mm )
+		{
+			m_last    = new MouseState( mm.m_last );
+			m_current = new MouseState( mm.m_current );
 		}
 
 		/// <summary>
-		///   Updates the mouse states.
+		///   Updates the managed device states.
 		/// </summary>
 		public void Update()
 		{
 			m_last = new MouseState( m_current );
 			m_current.Update();
+		}
+		/// <summary>
+		///   Reset the device state.
+		/// </summary>
+		public void Reset()
+		{
+			m_last.Reset();
+			m_current.Reset();
 		}
 
 		/// <summary>
@@ -170,6 +185,46 @@ namespace SFInput
 			return m_current.Position;
 		}
 		/// <summary>
+		///   Get the current mouse position in desktop coordinates.
+		/// </summary>
+		/// <returns>
+		///   The current mouse position relative to the desktop.
+		/// </returns>
+		public Vector2f GetNormalizedPosition()
+		{
+			return m_current.NormalizePosition();
+		}
+		/// <summary>
+		///   The mouse position normalized in relation to a window size.
+		/// </summary>
+		/// <param name="size">
+		///   The window size.
+		/// </param>
+		/// <returns>
+		///   The mouse position normalized in relation to the window size.
+		/// </returns>
+		public Vector2f GetNormalizedPosition( Vector2f size )
+		{
+			return m_current.NormalizePosition( size );
+		}
+		/// <summary>
+		///   The mouse position normalized in relation to a window position and size.
+		/// </summary>
+		/// <param name="pos">
+		///   The window position.
+		/// </param>
+		/// <param name="size">
+		///   The window size.
+		/// </param>
+		/// <returns>
+		///   The mouse position normalized in relation to the window position and size.
+		/// </returns>
+		public Vector2f GetNormalizePosition( Vector2f pos, Vector2f size )
+		{
+			return m_current.NormalizePosition( pos, size );
+		}
+
+		/// <summary>
 		///   Get the previous mouse position in desktop coordinates.
 		/// </summary>
 		/// <returns>
@@ -178,6 +233,45 @@ namespace SFInput
 		public Vector2i GetLastPosition()
 		{
 			return m_last.Position;
+		}
+		/// <summary>
+		///   Get the last mouse position in desktop coordinates.
+		/// </summary>
+		/// <returns>
+		///   The last mouse position relative to the desktop.
+		/// </returns>
+		public Vector2f GetLastNormalizedPosition()
+		{
+			return m_current.NormalizePosition();
+		}
+		/// <summary>
+		///   The last mouse position normalized in relation to a window size.
+		/// </summary>
+		/// <param name="size">
+		///   The window size.
+		/// </param>
+		/// <returns>
+		///   The last mouse position normalized in relation to the window size.
+		/// </returns>
+		public Vector2f GetLastNormalizedPosition( Vector2f size )
+		{
+			return m_current.NormalizePosition( size );
+		}
+		/// <summary>
+		///   The lastmouse position normalized in relation to a window position and size.
+		/// </summary>
+		/// <param name="pos">
+		///   The window position.
+		/// </param>
+		/// <param name="size">
+		///   The window size.
+		/// </param>
+		/// <returns>
+		///   The last mouse position normalized in relation to the window position and size.
+		/// </returns>
+		public Vector2f GetaLastNormalizePosition( Vector2f pos, Vector2f size )
+		{
+			return m_current.NormalizePosition( pos, size );
 		}
 
 		/// <summary>
@@ -195,306 +289,368 @@ namespace SFInput
 		}
 
 		/// <summary>
-		///   Get the value of the given mouse axis.
+		///   If the button is pressed.
 		/// </summary>
-		/// <param name="axis">
-		///   The mouse axis.
+		/// <param name="but">
+		///   The index of the button.
 		/// </param>
 		/// <returns>
-		///   The value of the given mouse axis.
+		///   True if the button index is valid and the button is pressed, otherwise false.
 		/// </returns>
-		public float GetAxis( MouseAxis axis )
+		public bool IsPressed( uint but )
 		{
-			if( axis == MouseAxis.XPosition )
-				return GetPosition().X;
-			else if( axis == MouseAxis.YPosition )
-				return GetPosition().Y;
-
-			return 0.0f;
+			return m_current.IsPressed( but );
 		}
 		/// <summary>
-		///   Get the value of the given mouse axis.
+		///   If the button is pressed.
 		/// </summary>
-		/// <param name="axis">
-		///   The name or number of the mouse axis.
+		/// <param name="but">
+		///   The name of the button.
 		/// </param>
 		/// <returns>
-		///   The value of the given mouse axis.
+		///   True if the button name is valid and the button is pressed, otherwise false.
 		/// </returns>
-		public float GetAxis( string axis )
+		public bool IsPressed( string but )
 		{
-			if( !IsAxis( axis ) )
-				return 0.0f;
-
-			return GetAxis( ToAxis( axis ).Value );
+			return m_current.IsPressed( but );
 		}
 		/// <summary>
-		///   Gets the value of the given mouse axis relative to the given window.
+		///   If the button is pressed.
 		/// </summary>
-		/// <param name="axis">
-		///   The mouse axis.
-		/// </param>
-		/// <param name="window">
-		///   The window.
+		/// <param name="but">
+		///   The index of the button.
 		/// </param>
 		/// <returns>
-		///   The value of the given mouse axis relative to the given window.
+		///   True if the button index is valid and the button is pressed, otherwise false.
 		/// </returns>
-		public float GetAxis( MouseAxis axis, Window window )
+		public bool IsPressed( Mouse.Button but )
 		{
-			if( axis == MouseAxis.XPosition )
-				return GetPosition( window ).X;
-			else if( axis == MouseAxis.YPosition )
-				return GetPosition( window ).Y;
-
-			return 0.0f;
-		}
-		/// <summary>
-		///   Gets the value of the given mouse axis relative to the given window.
-		/// </summary>
-		/// <param name="axis">
-		///   The name or number of the mouse axis.
-		/// </param>
-		/// <param name="window">
-		///   The window.
-		/// </param>
-		/// <returns>
-		///   The value of the given mouse axis relative to the given window.
-		/// </returns>
-		public float GetAxis( string axis, Window window )
-		{
-			if( !IsAxis( axis ) )
-				return 0.0f;
-
-			return GetAxis( ToAxis( axis ).Value, window );
+			return m_current.IsPressed( but );
 		}
 
 		/// <summary>
-		///   Get the previous value of the given mouse axis.
+		///   If the button has just been pressed.
 		/// </summary>
-		/// <param name="axis">
-		///   The mouse axis.
+		/// <param name="but">
+		///   The index of the button.
 		/// </param>
 		/// <returns>
-		///   The previous value of the given mouse axis.
+		///   True if the button index is valid and the button has just been pressed, otherwise false.
 		/// </returns>
-		public float GetLastAxis( MouseAxis axis )
+		public bool JustPressed( uint but )
 		{
-			if( axis == MouseAxis.XPosition )
-				return GetLastPosition().X;
-			else if( axis == MouseAxis.YPosition )
-				return GetLastPosition().Y;
-
-			return 0.0f;
+			return m_current.IsPressed( but ) && !m_last.IsPressed( but );
 		}
 		/// <summary>
-		///   Get the previous value of the given mouse axis.
+		///   If the button has just been pressed.
 		/// </summary>
-		/// <param name="axis">
-		///   The name or number of the mouse axis.
+		/// <param name="but">
+		///   The name of the button.
 		/// </param>
 		/// <returns>
-		///   The previous value of the given mouse axis.
+		///   True if the button name is valid and the button has just been pressed, otherwise false.
 		/// </returns>
-		public float GetLastAxis( string axis )
+		public bool JustPressed( string but )
 		{
-			if( !IsAxis( axis ) )
-				return 0.0f;
-
-			return GetLastAxis( ToAxis( axis ).Value );
+			return m_current.IsPressed( but ) && !m_last.IsPressed( but );
+		}
+		/// <summary>
+		///   If the button has just been pressed.
+		/// </summary>
+		/// <param name="but">
+		///   The index of the button.
+		/// </param>
+		/// <returns>
+		///   True if the button index is valid and the button has just been pressed, otherwise false.
+		/// </returns>
+		public bool JustPressed( Mouse.Button but )
+		{
+			return m_current.IsPressed( but ) && !m_last.IsPressed( but );
 		}
 
 		/// <summary>
-		///   Get the delta value of the given mouse axis.
+		///   If the button has just been released.
 		/// </summary>
-		/// <param name="axis">
-		///   The mouse axis.
+		/// <param name="but">
+		///   The index of the button.
 		/// </param>
 		/// <returns>
-		///   The delta value of the given mouse axis.
+		///   True if the button index is valid and the button has just been released, otherwise false.
 		/// </returns>
-		public float GetAxisDelta( MouseAxis axis )
+		public bool JustReleased( uint but )
 		{
-			if( axis == MouseAxis.XPosition )
-				return m_current.Position.X - m_last.Position.X;
-			else if( axis == MouseAxis.YPosition )
-				return m_current.Position.Y - m_last.Position.Y;
-
-			return 0.0f;
+			return !m_current.IsPressed( but ) && m_last.IsPressed( but );
 		}
 		/// <summary>
-		///   Get the delta value of the given mouse axis.
+		///   If the button has just been released.
 		/// </summary>
-		/// <param name="axis">
-		///   The name or number of the mouse axis.
+		/// <param name="but">
+		///   The name of the button.
 		/// </param>
 		/// <returns>
-		///   The delta value of the given mouse axis.
+		///   True if the button name is valid and the button has just been released, otherwise false.
 		/// </returns>
-		public float GetAxisDelta( string axis )
+		public bool JustReleased( string but )
 		{
-			if( !IsAxis( axis ) )
-				return 0.0f;
-
-			return GetAxisDelta( ToAxis( axis ).Value );
+			return !m_current.IsPressed( but ) && m_last.IsPressed( but );
 		}
+		/// <summary>
+		///   If the button has just been released.
+		/// </summary>
+		/// <param name="but">
+		///   The index of the button.
+		/// </param>
+		/// <returns>
+		///   True if the button index is valid and the button has just been released, otherwise false.
+		/// </returns>
+		public bool JustReleased( Mouse.Button but )
+		{
+			return !m_current.IsPressed( but ) && m_last.IsPressed( but );
+		}
+
+		/// <summary>
+		///   Gets the current state of the axis.
+		/// </summary>
+		/// <param name="ax">
+		///   The index of the axis.
+		/// </param>
+		/// <returns>
+		///   The current state of the axis if the index is valid, otherwise 0.0.
+		/// </returns>
+		public float GetAxis( uint ax )
+		{
+			return m_current.GetAxis( ax );
+		}
+		/// <summary>
+		///   Gets the current state of the axis.
+		/// </summary>
+		/// <param name="ax">
+		///   The name of the axis.
+		/// </param>
+		/// <returns>
+		///   The current state of the axis if the name is valid, otherwise 0.0.
+		/// </returns>
+		public float GetAxis( string ax )
+		{
+			return m_current.GetAxis( ax );
+		}
+		/// <summary>
+		///   Gets the current state of the axis.
+		/// </summary>
+		/// <param name="ax">
+		///   The index of the axis.
+		/// </param>
+		/// <returns>
+		///   The current state of the axis if the index is valid, otherwise 0.0.
+		/// </returns>
+		public float GetAxis( MouseAxis ax )
+		{
+			return m_current.GetAxis( ax );
+		}
+
+		/// <summary>
+		///   Gets the previous state of the axis.
+		/// </summary>
+		/// <param name="ax">
+		///   The index of the axis.
+		/// </param>
+		/// <returns>
+		///   The previous state of the axis if the index is valid, otherwise 0.0.
+		/// </returns>
+		public float GetLastAxis( uint ax )
+		{
+			return m_last.GetAxis( ax );
+		}
+		/// <summary>
+		///   Gets the previous state of the axis.
+		/// </summary>
+		/// <param name="ax">
+		///   The name of the axis.
+		/// </param>
+		/// <returns>
+		///   The previous state of the axis if the name is valid, otherwise 0.0.
+		/// </returns>
+		public float GetLastAxis( string ax )
+		{
+			return m_last.GetAxis( ax );
+		}
+		/// <summary>
+		///   Gets the previous state of the axis.
+		/// </summary>
+		/// <param name="ax">
+		///   The index of the axis.
+		/// </param>
+		/// <returns>
+		///   The previous state of the axis if the index is valid, otherwise 0.0.
+		/// </returns>
+		public float GetLastAxis( MouseAxis ax )
+		{
+			return m_last.GetAxis( ax );
+		}
+
+		/// <summary>
+		///   Gets the difference in value between the last two update calls of the given axis from the given joystick
+		///   player index.
+		/// </summary>
+		/// <param name="ax">
+		///   The axis to check.
+		/// </param>
+		/// <returns>
+		///   The difference in value between the last to update calls of the given axis from the given joystick player
+		///   index. Will also return zero if <paramref name="axis"/> is out of range.
+		/// </returns>
+		public float AxisDelta( uint ax )
+		{
+			return m_current.GetAxis( ax ) - m_last.GetAxis( ax );
+		}
+		/// <summary>
+		///   Gets the difference in value between the last two update calls of the given axis from the given joystick
+		///   player index.
+		/// </summary>
+		/// <param name="ax">
+		///   The axis to check.
+		/// </param>
+		///   The difference in value between the last to update calls of the given axis from the given joystick player
+		///   index. Will also return zero if <paramref name="axis"/> is out of range.
+		/// </returns>
+		public float AxisDelta( string ax )
+		{
+			return m_current.GetAxis( ax ) - m_last.GetAxis( ax );
+		}
+		/// <summary>
+		///   Gets the difference in value between the last two update calls of the given axis from the given joystick
+		///   player index.
+		/// </summary>
+		/// <param name="ax">
+		///   The axis to check.
+		/// </param>
+		/// <returns>
+		///   The difference in value between the last to update calls of the given axis from the given joystick player
+		///   index. Will also return zero if <paramref name="ax"/> is out of range.
+		/// </returns>
+		public float AxisDelta( MouseAxis ax )
+		{
+			return m_current.GetAxis( ax ) - m_last.GetAxis( ax );
+		}
+
 		/// <summary>
 		///   Check if the given axis is pressed.
 		/// </summary>
-		/// <param name="axis">
-		///   The axis to check.
+		/// <param name="ax">
+		///   The index of the axis.
 		/// </param>
 		/// <returns>
 		///   True if the given axis is pressed and false otherwise.
 		/// </returns>
-		public bool IsAxisPressed( MouseAxis axis )
+		public bool AxisIsPressed( uint ax )
 		{
-			return m_current.IsAxisPressed( axis );
+			return m_current.AxisIsPressed( ax );
 		}
 		/// <summary>
 		///   Check if the given axis is pressed.
 		/// </summary>
-		/// <param name="axis">
-		///   The axis to check.
+		/// <param name="ax">
+		///   The name of the axis.
 		/// </param>
 		/// <returns>
 		///   True if the given axis is pressed and false otherwise.
 		/// </returns>
-		public bool IsAxisPressed( string axis )
+		public bool AxisIsPressed( string ax )
 		{
-			return m_current.IsAxisPressed( axis );
+			return m_current.AxisIsPressed( ax );
 		}
 		/// <summary>
-		///   Check if the given axis has just been pressed.
+		///   Check if the given axis is pressed.
 		/// </summary>
-		/// <param name="axis">
-		///   The axis to check.
+		/// <param name="ax">
+		///   The index of the axis.
 		/// </param>
 		/// <returns>
-		///   True if the given axis has just been pressed and false otherwise.
+		///   True if the given axis is pressed and false otherwise.
 		/// </returns>
-		public bool AxisJustPressed( MouseAxis axis )
+		public bool AxisIsPressed( MouseAxis ax )
 		{
-			return m_current.IsAxisPressed( axis ) && !m_last.IsAxisPressed( axis );
-		}
-		/// <summary>
-		///   Check if the given axis has just been pressed.
-		/// </summary>
-		/// <param name="axis">
-		///   The axis to check.
-		/// </param>
-		/// <returns>
-		///   True if the given axis has just been pressed and false otherwise.
-		/// </returns>
-		public bool AxisJustPressed( string axis )
-		{
-			return m_current.IsAxisPressed( axis ) && !m_last.IsAxisPressed( axis );
-		}
-		/// <summary>
-		///   Check if the given axis has just been released.
-		/// </summary>
-		/// <param name="axis">
-		///   The axis to check.
-		/// </param>
-		/// <returns>
-		///   True if the given axis has just been released and false otherwise.
-		/// </returns>
-		public bool AxisJustReleased( MouseAxis axis )
-		{
-			return !m_current.IsAxisPressed( axis ) && m_last.IsAxisPressed( axis );
-		}
-		/// <summary>
-		///   Check if the given axis has just been released.
-		/// </summary>
-		/// <param name="axis">
-		///   The axis to check.
-		/// </param>
-		/// <returns>
-		///   True if the given axis has just been released and false otherwise.
-		/// </returns>
-		public bool AxisJustReleased( string axis )
-		{
-			return !m_current.IsAxisPressed( axis ) && m_last.IsAxisPressed( axis );
+			return m_current.AxisIsPressed( ax );
 		}
 
+		/// <summary>
+		///   Check if the given axis was just pressed.
+		/// </summary>
+		/// <param name="ax">
+		///   The index of the axis.
+		/// </param>
+		/// <returns>
+		///   True if the given axis was just pressed and false otherwise.
+		/// </returns>
+		public bool AxisJustPressed( uint ax )
+		{
+			return m_current.AxisIsPressed( ax ) && !m_last.AxisIsPressed( ax );
+		}
+		/// <summary>
+		///   Check if the given axis was just pressed.
+		/// </summary>
+		/// <param name="ax">
+		///   The name of the axis.
+		/// </param>
+		/// <returns>
+		///   True if the given axis was just pressed and false otherwise.
+		/// </returns>
+		public bool AxisJustPressed( string ax )
+		{
+			return m_current.AxisIsPressed( ax ) && !m_last.AxisIsPressed( ax );
+		}
+		/// <summary>
+		///   Check if the given axis was just pressed.
+		/// </summary>
+		/// <param name="ax">
+		///   The index of the axis.
+		/// </param>
+		/// <returns>
+		///   True if the given axis was just pressed and false otherwise.
+		/// </returns>
+		public bool AxisJustPressed( MouseAxis ax )
+		{
+			return m_current.AxisIsPressed( ax ) && !m_last.AxisIsPressed( ax );
+		}
 
 		/// <summary>
-		///   Check if the given button is pressed.
+		///   Check if the given axis was just released.
 		/// </summary>
-		/// <param name="button">
-		///   The button to check.
+		/// <param name="ax">
+		///   The axis to check.
 		/// </param>
 		/// <returns>
-		///   True if the given button is pressed and false otherwise.
+		///   True if the given axis was just released and false otherwise.
 		/// </returns>
-		public bool IsPressed( Mouse.Button button )
+		public bool AxisJustReleased( uint ax )
 		{
-			return m_current.IsPressed( button );
+			return !m_current.AxisIsPressed( ax ) && m_last.AxisIsPressed( ax );
 		}
 		/// <summary>
-		///   Check if the given button is pressed.
+		///   Check if the given axis was just released.
 		/// </summary>
-		/// <param name="button">
-		///   The button to check.
+		/// <param name="ax">
+		///   The axis to check.
 		/// </param>
 		/// <returns>
-		///   True if the given button is pressed and false otherwise.
+		///   True if the given axis was just released and false otherwise.
 		/// </returns>
-		public bool IsPressed( string button )
+		public bool AxisJustReleased( string ax )
 		{
-			return m_current.IsPressed( button );
+			return !m_current.AxisIsPressed( ax ) && m_last.AxisIsPressed( ax );
 		}
 		/// <summary>
-		///   Check if the given button was just pressed.
+		///   Check if the given axis was just released.
 		/// </summary>
-		/// <param name="button">
-		///   The button to check.
+		/// <param name="ax">
+		///   The axis to check.
 		/// </param>
 		/// <returns>
-		///   True if the given button was just pressed and false otherwise.
+		///   True if the given axis was just released and false otherwise.
 		/// </returns>
-		public bool JustPressed( Mouse.Button button )
+		public bool AxisJustReleased( MouseAxis ax )
 		{
-			return ( m_current.IsPressed( button ) && !m_last.IsPressed( button ) );
-		}
-		/// <summary>
-		///   Check if the given button was just pressed.
-		/// </summary>
-		/// <param name="button">
-		///   The button to check.
-		/// </param>
-		/// <returns>
-		///   True if the given button was just pressed and false otherwise.
-		/// </returns>
-		public bool JustPressed( string button )
-		{
-			return ( m_current.IsPressed( button ) && !m_last.IsPressed( button ) );
-		}
-		/// <summary>
-		///   Check if the given button was just released.
-		/// </summary>
-		/// <param name="button">
-		///   The button to check.
-		/// </param>
-		/// <returns>
-		///   True if the given button was just released and false otherwise.
-		/// </returns>
-		public bool JustReleased( Mouse.Button button )
-		{
-			return ( !m_current.IsPressed( button ) && m_last.IsPressed( button ) );
-		}
-		/// <summary>
-		///   Check if the given button was just released.
-		/// </summary>
-		/// <param name="button">
-		///   The button to check.
-		/// </param>
-		/// <returns>
-		///   True if the given button was just released and false otherwise.
-		/// </returns>
-		public bool JustReleased( string button )
-		{
-			return ( !m_current.IsPressed( button ) && m_last.IsPressed( button ) );
+			return !m_current.AxisIsPressed( ax ) && m_last.AxisIsPressed( ax );
 		}
 
 		private MouseState m_current,

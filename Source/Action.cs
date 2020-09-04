@@ -105,7 +105,7 @@ namespace SFInput
 					{
 						float v = map.Device == InputDevice.Mouse ?
 						          Input.Manager.Mouse.GetAxis( Inputs[ i ].Value ) :
-								  Input.Manager.Joystick.GetAxis( 0, Inputs[ i ].Value );
+								  Input.Manager.Joystick[ Input.Manager.FirstJoystick ].GetAxis( Inputs[ i ].Value );
 
 						if( v != 0.0f )
 							return map.Invert ? -v : v;
@@ -114,10 +114,10 @@ namespace SFInput
 					{
 						bool p = map.Device == InputDevice.Keyboard ? Input.Manager.Keyboard.IsPressed( Inputs[ i ].Value ) :
 						       ( map.Device == InputDevice.Mouse    ? Input.Manager.Mouse.IsPressed( Inputs[ i ].Value ) :
-						       ( map.Device == InputDevice.Joystick ? Input.Manager.Joystick.IsPressed( 0, Inputs[ i ].Value ) : false ) );
+						       ( map.Device == InputDevice.Joystick ? Input.Manager.Joystick[ Input.Manager.FirstJoystick ].IsPressed( Inputs[ i ].Value ) : false ) );
 						bool n = map.Device == InputDevice.Keyboard ? Input.Manager.Keyboard.IsPressed( Inputs[ i ].Negative ) :
 							   ( map.Device == InputDevice.Mouse    ? Input.Manager.Mouse.IsPressed( Inputs[ i ].Negative ) :
-							   ( map.Device == InputDevice.Joystick ? Input.Manager.Joystick.IsPressed( 0, Inputs[ i ].Negative ) : false ) );
+							   ( map.Device == InputDevice.Joystick ? Input.Manager.Joystick[ Input.Manager.FirstJoystick ].IsPressed( Inputs[ i ].Negative ) : false ) );
 
 						if( ( p && n ) || ( !p && !n ) )
 							continue;

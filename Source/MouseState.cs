@@ -21,7 +21,6 @@
 ////////////////////////////////////////////////////////////////////////////////
 
 using System;
-using System.Collections.Generic;
 using SFML.System;
 using SFML.Window;
 
@@ -30,19 +29,20 @@ namespace SFInput
 	/// <summary>
 	///   Represents the state of the mouse at a given moment.
 	/// </summary>
-	public class MouseState
+	public class MouseState : ICloneable
 	{
+		public const uint ButtonCount = (uint)Mouse.Button.ButtonCount;
+		public const uint AxisCount   = (uint)MouseAxis.COUNT;
+
 		/// <summary>
 		///   Construct a new state.
 		/// </summary>
 		public MouseState()
 		{
 			Position = new Vector2i();
-			int count = (int)Mouse.Button.ButtonCount;
-			m_but = new List<bool>( count );
-
-			for( int i = 0; i < count; i++ )
-				m_but.Add( false );
+			m_button = new bool[ ButtonCount ];
+			m_axis   = new float[ AxisCount ];
+			Reset();
 		}
 		/// <summary>
 		///   Construct a new state by copying from another instance.
@@ -58,8 +58,18 @@ namespace SFInput
 			if( state == null )
 				throw new ArgumentNullException();
 
+			m_button = ButtonCount > 0 ? new bool[ ButtonCount ] : null;
+			m_axis = AxisCount > 0 ? new float[ AxisCount ] : null;
+
+			if( m_button != null )
+				for( uint i = 0; i < ButtonCount; i++ )
+					m_button[ i ] = state.m_button[ i ];
+
+			if( m_axis != null )
+				for( uint i = 0; i < AxisCount; i++ )
+					m_axis[ i ] = state.m_axis[ i ];
+
 			Position = state.Position;
-			m_but = new List<bool>( state.m_but );
 		}
 
 		/// <summary>
@@ -69,86 +79,213 @@ namespace SFInput
 		{
 			get; private set;
 		}
-		
+
 		/// <summary>
-		///   Update to the current state of the mouse.
+		///   The mouse position normalized in relation to the desktop.
 		/// </summary>
+		/// <returns>
+		///   The mouse position normalized in relation to the desktop.
+		/// </returns>
+		public Vector2f NormalizePosition()
+		{
+			VideoMode desk = VideoMode.DesktopMode;
+			return new Vector2f( Position.X / desk.Width, Position.Y / desk.Height );
+		}
+
+		/// <summary>
+		///   The mouse position normalized in relation to a window size.
+		/// </summary>
+		/// <param name="size">
+		///   The window size.
+		/// </param>
+		/// <returns>
+		///   The mouse position normalized in relation to the window size.
+		/// </returns>
+		public Vector2f NormalizePosition( Vector2f size )
+		{
+			if( size.X <= 0 || size.Y <= 0 )
+				return default( Vector2f );
+
+			return new Vector2f( Position.X / size.X, Position.Y / size.Y );
+		}
+		/// <summary>
+		///   The mouse position normalized in relation to a window position and size.
+		/// </summary>
+		/// <param name="pos">
+		///   The window position.
+		/// </param>
+		/// <param name="size">
+		///   The window size.
+		/// </param>
+		/// <returns>
+		///   The mouse position normalized in relation to the window position and size.
+		/// </returns>
+		public Vector2f NormalizePosition( Vector2f pos, Vector2f size )
+		{
+			if( size.X <= 0 || size.Y <= 0 )
+				return default( Vector2f );
+
+			Vector2f position = new Vector2f( Position.X - pos.X, Position.Y - pos.Y );
+			return new Vector2f( position.X / size.X, position.Y / size.Y );
+		}
+
 		public void Update()
 		{
 			Position = Mouse.GetPosition();
 
-			for( int i = 0; i < m_but.Count; i++ )
-				m_but[ i ] = Mouse.IsButtonPressed( (Mouse.Button)i );
+			for( int i = 0; i < ButtonCount; i++ )
+				m_button[ i ] = Mouse.IsButtonPressed( (Mouse.Button)i );
+
+			m_axis[ (uint)MouseAxis.XPosition ] = Position.X;
+			m_axis[ (uint)MouseAxis.YPosition ] = Position.Y;
+		}
+		public void Reset()
+		{
+			if( m_button != null )
+				for( uint i = 0; i < ButtonCount; i++ )
+					m_button[ i ] = false;
+			if( m_axis != null )
+				for( uint i = 0; i < AxisCount; i++ )
+					m_axis[ i ] = 0.0f;
+
+			Position = default( Vector2i );
 		}
 
 		/// <summary>
-		///   If a given button was pressed on the last call to <see cref="Update"/>.
+		///   If the button is pressed.
+		/// </summary>
+		/// <param name="button">
+		///   The index of the button.
+		/// </param>
+		/// <returns>
+		///   True if the button index is within range and the button is pressed, otherwise false.
+		/// </returns>
+		public bool IsPressed( uint button )
+		{
+			if( button >= ButtonCount )
+				return false;
+
+			return m_button[ button ];
+		}
+		/// <summary>
+		///   If the button is pressed.
 		/// </summary>
 		/// <param name="but">
 		///   The button to check.
 		/// </param>
 		/// <returns>
-		///   True if the given button is pressed and false otherwise.
+		///   True if the button is within range and is pressed, otherwise false.
 		/// </returns>
 		public bool IsPressed( Mouse.Button but )
 		{
 			if( but < 0 || but >= Mouse.Button.ButtonCount )
 				return false;
 
-			return m_but[ (int)but ];
+			return IsPressed( (uint)but );
 		}
-		/// <summary>
-		///   If a given button is pressed on the last call to <see cref="Update"/>.
-		/// </summary>
-		/// <param name="but">
-		///   The button to check.
-		/// </param>
-		/// <returns>
-		///   True if the given button is pressed and false otherwise.
-		/// </returns>
 		public bool IsPressed( string but )
 		{
 			if( !MouseManager.IsButton( but ) )
 				return false;
 
-			return IsPressed( MouseManager.ToButton( but ).Value );
+			return IsPressed( (uint)MouseManager.ToButton( but ) );
 		}
 
 		/// <summary>
-		///   If a given axis is classed as pressed on the last call to <see cref="Update"/>.
+		///   The current axis value.
 		/// </summary>
 		/// <param name="axis">
-		///   The axis to check.
+		///   The index of the axis.
 		/// </param>
 		/// <returns>
-		///   True if the given axis is pressed and false otherwise.
+		///   The value of the axis if the index is within range, otherwise 0.
 		/// </returns>
-		public bool IsAxisPressed( MouseAxis axis )
+		public float GetAxis( uint axis )
 		{
-			if( axis == MouseAxis.XPosition )
-				return Position.X >= Input.AxisPressThreshold;
-			else if( axis == MouseAxis.YPosition )
-				return Position.Y >= Input.AxisPressThreshold;
+			if( axis >= AxisCount )
+				return 0.0f;
 
-			return false;
+			return m_axis[ axis ];
 		}
 		/// <summary>
-		///   If a given axis is pressed on the last call to <see cref="Update"/>.
+		///   The value of the axis.
 		/// </summary>
 		/// <param name="axis">
 		///   The axis to check.
 		/// </param>
 		/// <returns>
-		///   True if the given axis is pressed and false otherwise.
+		///   The value of the axis if it is within range, otherwise 0.0.
 		/// </returns>
-		public bool IsAxisPressed( string axis )
+		public float GetAxis( MouseAxis axis )
+		{
+			if( axis < 0 || axis >= MouseAxis.COUNT )
+				return 0.0f;
+
+			return GetAxis( (uint)axis );
+		}
+		public float GetAxis( string axis )
 		{
 			if( !MouseManager.IsAxis( axis ) )
-				return false;
+				return 0.0f;
 
-			return IsAxisPressed( MouseManager.ToAxis( axis ).Value );
+			return GetAxis( (uint)MouseManager.ToAxis( axis ) );
 		}
 
-		private List<bool> m_but;
+		/// <summary>
+		///   If the axis is engaged enough to be pressed.
+		/// </summary>
+		/// <param name="axis">
+		///   The index of the axis.
+		/// </param>
+		/// <param name="bidir">
+		///   If a negative axis value should trigger a press.
+		/// </param>
+		/// <returns>
+		///   If the axis is engaged enough to be pressed. 
+		/// </returns>
+		public bool AxisIsPressed( uint axis, bool bidir = false )
+		{
+			return ( bidir ? Math.Abs( GetAxis( axis ) ) : GetAxis( axis ) ) >= Input.AxisPressThreshold;
+		}
+		/// <summary>
+		///   If the axis is engaged enough to be pressed.
+		/// </summary>
+		/// <param name="axis">
+		///   The index of the axis.
+		/// </param>
+		/// <param name="bidir">
+		///   If a negative axis value should trigger a press.
+		/// </param>
+		/// <returns>
+		///   If the axis is engaged enough to be pressed. 
+		/// </returns>
+		public bool AxisIsPressed( MouseAxis axis, bool bidir = false )
+		{
+			return ( bidir ? Math.Abs( GetAxis( axis ) ) : GetAxis( axis ) ) >= Input.AxisPressThreshold;
+		}
+		/// <summary>
+		///   If the axis is engaged enough to be pressed.
+		/// </summary>
+		/// <param name="axis">
+		///   The name of the axis.
+		/// </param>
+		/// <param name="bidir">
+		///   If a negative axis value should trigger a press.
+		/// </param>
+		/// <returns>
+		///   If the axis is engaged enough to be pressed. 
+		/// </returns>
+		public bool AxisIsPressed( string axis, bool bidir = false )
+		{
+			return ( bidir ? Math.Abs( GetAxis( axis ) ) : GetAxis( axis ) ) >= Input.AxisPressThreshold;
+		}
+
+		public object Clone()
+		{
+			return new MouseState( this );
+		}
+
+		private bool[] m_button;
+		private float[] m_axis;
 	}
 }

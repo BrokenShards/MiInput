@@ -93,7 +93,6 @@ namespace SFInputTest
 
 		static bool WindowTest()
 		{
-			Input.Manager.UseXInput = true;
 			Input.Manager.Update();
 
 			Action test = new Action( "test" );

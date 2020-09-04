@@ -28,7 +28,7 @@ namespace SFInput
 	/// <summary>
 	///   Manages the state of the Keyboard.
 	/// </summary>
-	public sealed class KeyboardManager
+	public class KeyboardManager
 	{
 		/// <summary>
 		///   Checks if the given string represents a valid key.
@@ -69,116 +69,171 @@ namespace SFInput
 		/// <returns>
 		///   The keyboard key parsed from the string on success or null on failure.
 		/// </returns>
-		public static Keyboard.Key? ToKey( string val )
+		public static Keyboard.Key ToKey( string val )
 		{
-			if( !IsKey( val ) )
-				return null;
+			if( Enum.TryParse( val, true, out Keyboard.Key key ) )
+				return key;
+			if( uint.TryParse( val, out uint k ) && k < (uint)Keyboard.Key.KeyCount )
+				return (Keyboard.Key)k;
 
-			if( !Enum.TryParse( val, true, out Keyboard.Key key ) )
-				return (Keyboard.Key)uint.Parse( val );
-
-			return key;
+			return Keyboard.Key.Unknown;
 		}
-
-
+		
 		/// <summary>
-		///   Constructs the instance.
+		///   Constructor.
 		/// </summary>
 		public KeyboardManager()
 		{
-			m_current = new KeyboardState();
 			m_last    = new KeyboardState();
+			m_current = new KeyboardState();
+		}
+		/// <summary>
+		///   Copy constructor.
+		/// </summary>
+		public KeyboardManager( KeyboardManager km )
+		{
+			m_last    = new KeyboardState( km.m_last );
+			m_current = new KeyboardState( km.m_current );
 		}
 
 		/// <summary>
-		///   Updates the keyboard states.
+		///   Updates the managed device states.
 		/// </summary>
 		public void Update()
 		{
 			m_last = new KeyboardState( m_current );
 			m_current.Update();
 		}
+		/// <summary>
+		///   Reset the device state.
+		/// </summary>
+		public void Reset()
+		{
+			m_last.Reset();
+			m_current.Reset();
+		}
 
 		/// <summary>
-		///   Check if the given key is pressed.
+		///   If the button is pressed.
 		/// </summary>
-		/// <param name="key">
-		///   The key to check.
+		/// <param name="but">
+		///   The index of the button.
 		/// </param>
 		/// <returns>
-		///   True if the given key is pressed and false otherwise.
+		///   True if the button index is valid and the button is pressed, otherwise false.
+		/// </returns>
+		public bool IsPressed( uint but )
+		{
+			return m_current.IsPressed( but );
+		}
+		/// <summary>
+		///   If the button is pressed.
+		/// </summary>
+		/// <param name="but">
+		///   The name of the button.
+		/// </param>
+		/// <returns>
+		///   True if the button name is valid and the button is pressed, otherwise false.
+		/// </returns>
+		public bool IsPressed( string but )
+		{
+			return m_current.IsPressed( but );
+		}
+		/// <summary>
+		///   If the key is pressed.
+		/// </summary>
+		/// <param name="key">
+		///   The index of the key.
+		/// </param>
+		/// <returns>
+		///   True if the key index is valid and the key is pressed, otherwise false.
 		/// </returns>
 		public bool IsPressed( Keyboard.Key key )
 		{
 			return m_current.IsPressed( key );
 		}
+
 		/// <summary>
-		///   Check if the given key is pressed.
+		///   If the button has just been pressed.
 		/// </summary>
-		/// <param name="key">
-		///   The name of the key to check.
+		/// <param name="but">
+		///   The index of the button.
 		/// </param>
 		/// <returns>
-		///   True if the given key is pressed and false otherwise.
+		///   True if the button index is valid and the button has just been pressed, otherwise false.
 		/// </returns>
-		public bool IsPressed( string key )
+		public bool JustPressed( uint but )
 		{
-			return m_current.IsPressed( key );
+			return m_current.IsPressed( but ) && !m_last.IsPressed( but );
 		}
 		/// <summary>
-		///   Check if the given key was just pressed.
+		///   If the button has just been pressed.
 		/// </summary>
-		/// <param name="key">
-		///   The key to check.
+		/// <param name="but">
+		///   The name of the button.
 		/// </param>
 		/// <returns>
-		///   True if the given key was just pressed and false otherwise.
+		///   True if the button name is valid and the button has just been pressed, otherwise false.
+		/// </returns>
+		public bool JustPressed( string but )
+		{
+			return m_current.IsPressed( but ) && !m_last.IsPressed( but );
+		}
+		/// <summary>
+		///   If the key has just been pressed.
+		/// </summary>
+		/// <param name="key">
+		///   The index of the key.
+		/// </param>
+		/// <returns>
+		///   True if the key index is valid and the key has just been pressed, otherwise false.
 		/// </returns>
 		public bool JustPressed( Keyboard.Key key )
 		{
-			return( m_current.IsPressed( key ) && !m_last.IsPressed( key ) );
+			return m_current.IsPressed( key ) && !m_last.IsPressed( key );
 		}
+
 		/// <summary>
-		///   Check if the given key was just pressed.
+		///   If the button has just been released.
 		/// </summary>
-		/// <param name="key">
-		///   The key to check.
+		/// <param name="but">
+		///   The index of the button.
 		/// </param>
 		/// <returns>
-		///   True if the given key was just pressed and false otherwise.
+		///   True if the button index is valid and the button has just been released, otherwise false.
 		/// </returns>
-		public bool JustPressed( string key )
+		public bool JustReleased( uint but )
 		{
-			return ( m_current.IsPressed( key ) && !m_last.IsPressed( key ) );
+			return !m_current.IsPressed( but ) && m_last.IsPressed( but );
 		}
 		/// <summary>
-		///   Check if the given key was just released.
+		///   If the button has just been released.
 		/// </summary>
-		/// <param name="key">
-		///   The key to check.
+		/// <param name="but">
+		///   The name of the button.
 		/// </param>
 		/// <returns>
-		///   True if the given key was just released and false otherwise.
+		///   True if the button name is valid and the button has just been released, otherwise false.
+		/// </returns>
+		public bool JustReleased( string but )
+		{
+			return !m_current.IsPressed( but ) && m_last.IsPressed( but );
+		}
+		/// <summary>
+		///   If the key has just been released.
+		/// </summary>
+		/// <param name="key">
+		///   The index of the key.
+		/// </param>
+		/// <returns>
+		///   True if the key index is valid and the key has just been released, otherwise false.
 		/// </returns>
 		public bool JustReleased( Keyboard.Key key )
 		{
-			return( !m_current.IsPressed( key ) && m_last.IsPressed( key ) );
-		}
-		/// <summary>
-		///   Check if the given key was just released.
-		/// </summary>
-		/// <param name="key">
-		///   The key to check.
-		/// </param>
-		/// <returns>
-		///   True if the given key was just released and false otherwise.
-		/// </returns>
-		public bool JustReleased( string key )
-		{
-			return ( !m_current.IsPressed( key ) && m_last.IsPressed( key ) );
+			return !m_current.IsPressed( key ) && m_last.IsPressed( key );
 		}
 
 		private KeyboardState m_current,
-							  m_last;
+		                      m_last;
 	}
 }

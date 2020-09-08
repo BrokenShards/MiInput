@@ -35,7 +35,7 @@ namespace SFInput
 	public class ActionSet : IEnumerable<KeyValuePair<string, Action>>
 	{
 		/// <summary>
-		///   Constructor
+		///   Constructor.
 		/// </summary>
 		public ActionSet()
 		{
@@ -44,12 +44,23 @@ namespace SFInput
 		/// <summary>
 		///   Copy constructor.
 		/// </summary>
-		/// <param name="a"></param>
+		/// <param name="a">
+		///   The object to copy.
+		/// </param>
 		public ActionSet( ActionSet a )
 		{
 			m_actions = a.Empty ? new Dictionary<string, Action>() : new Dictionary<string, Action>( a.Count );
 		}
 
+		/// <summary>
+		///   Accesses the action with the given name if it exists within the set.
+		/// </summary>
+		/// <param name="a">
+		///   The name of the action.
+		/// </param>
+		/// <returns>
+		///   The action with the given name in the set if it exists, otherwise null.
+		/// </returns>
 		public Action this[ string a ]
 		{
 			get { return Get( a ); }
@@ -70,7 +81,7 @@ namespace SFInput
 			get { return m_actions.Count; }
 		}
 		/// <summary>
-		///   if the set contains either the given action, or an action with the same name.
+		///   If the set contains either the given action, or an action with the same name.
 		/// </summary>
 		/// <param name="a">
 		///   The action to check.
@@ -86,7 +97,7 @@ namespace SFInput
 			return m_actions.ContainsValue( a ) || Contains( a.Name );
 		}
 		/// <summary>
-		///   if the set contains an action with the given name.
+		///   If the set contains an action with the given name.
 		/// </summary>
 		/// <param name="action">
 		///   The action string to check.
@@ -106,13 +117,13 @@ namespace SFInput
 			return false;
 		}
 		/// <summary>
-		///   Gets the action with the given name from the set if it exists.
+		///   Gets the action with the given name if it exists within the set.
 		/// </summary>
 		/// <param name="action">
 		///   The name of the action.
 		/// </param>
 		/// <returns>
-		///   The action with the given name in the set if it esists, otherwise false.
+		///   The action with the given name in the set if it exists, otherwise null.
 		/// </returns>
 		public Action Get( string action )
 		{
@@ -231,9 +242,11 @@ namespace SFInput
 		}
 
 		/// <summary>
-		///   Returns the set as it would be in file.
+		///   Returns a string containg the xml data of the set as it would be written in file.
 		/// </summary>
-		/// <returns></returns>
+		/// <returns>
+		///   A string containg the xml data of the set as it would be written in file.
+		/// </returns>
 		public override string ToString()
 		{
 			StringBuilder sb = new StringBuilder();
@@ -249,9 +262,11 @@ namespace SFInput
 		}
 
 		/// <summary>
-		///   Gets an enumerator over the collection of actions.
+		///   Returns an enumerator that iterates through the collection.
 		/// </summary>
-		/// <returns></returns>
+		/// <returns>
+		///   An enumerator that can be used to iterate through the collection.
+		/// </returns>
 		public IEnumerator<KeyValuePair<string, Action>> GetEnumerator()
 		{
 			return ( (IEnumerable<KeyValuePair<string, Action>>)m_actions ).GetEnumerator();

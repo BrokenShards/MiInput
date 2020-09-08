@@ -20,7 +20,6 @@
 //
 ////////////////////////////////////////////////////////////////////////////////
 
-using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Text;
@@ -31,6 +30,9 @@ using SharpLogger;
 
 namespace SFInput
 {
+	/// <summary>
+	///   A collection of inputs mapped to a name.
+	/// </summary>
 	public class Action : INamable, IEnumerable<InputMap>
 	{
 		/// <summary>
@@ -68,7 +70,7 @@ namespace SFInput
 		}
 
 		/// <summary>
-		///   Positive action name.
+		///   Action name.
 		/// </summary>
 		public string Name
 		{
@@ -91,7 +93,7 @@ namespace SFInput
 		{
 			get
 			{
-				if( Inputs.Count == 0 )
+				if( Inputs == null || Inputs.Count == 0 )
 					return 0.0f;
 								
 				for( int i = 0; i < Inputs.Count; i++ )
@@ -144,20 +146,14 @@ namespace SFInput
 		/// </summary>
 		public bool IsPositive
 		{
-			get
-			{
-				return Value >= Input.AxisPressThreshold;
-			}
+			get { return Value >= Input.AxisPressThreshold; }
 		}
 		/// <summary>
 		///   If the mapped inputs are classed as negative.
 		/// </summary>
 		public bool IsNegative
 		{
-			get
-			{
-				return Value <= -Input.AxisPressThreshold;
-			}
+			get { return Value <= -Input.AxisPressThreshold; }
 		}
 
 		/// <summary>
@@ -211,7 +207,7 @@ namespace SFInput
 			}
 		}
 		/// <summary>
-		///   If any of the mapped inputs were just pressed.
+		///   If any of the mapped inputs were just released.
 		/// </summary>
 		public bool JustReleased
 		{
@@ -232,7 +228,23 @@ namespace SFInput
 		/// </summary>
 		public bool IsValid
 		{
-			get { return !string.IsNullOrWhiteSpace( Name ); }
+			get
+			{
+				if( !Naming.IsValid( Name ) || Inputs == null || Inputs.Count == 0 )
+					return false;
+
+				for( int i = 0; i < Inputs.Count - 1; i++ )
+				{
+					if( !Inputs[ i ].IsValid )
+						return false;
+
+					for( int j = i + 1; j < Inputs.Count; j++ )
+						if( InputMap.Collides( Inputs[ i ], Inputs[ j ] ) )
+							return false;
+				}
+
+				return true;
+			}
 		}
 
 		/// <summary>
@@ -249,17 +261,13 @@ namespace SFInput
 			if( node == null )
 				return Logger.LogReturn( "Unable to load action from a null xml element.", false, LogType.Error );
 
-			// Naming
-			{
-				string name = node.Attributes[ "name" ]?.Value?.Trim();
+			string name = node.Attributes[ "name" ]?.Value?.Trim();
 
-				if( !Naming.IsValid( name ) )
-					return Logger.LogReturn( "Unable to load action; name either does not exist or is invalid.", false, LogType.Error );
+			if( !Naming.IsValid( name ) )
+				return Logger.LogReturn( "Unable to load action; name either does not exist or is invalid.", false, LogType.Error );
 
-				Name = Naming.IsValid( name ) ? name : string.Empty;
-			}
-
-			// Inputs
+			Name = name;
+			
 			foreach( XmlNode n in node.ChildNodes )
 			{
 				string loname = n.Name.ToLower();
@@ -301,8 +309,7 @@ namespace SFInput
 		{
 			StringBuilder sb = new StringBuilder();
 
-			string tabs= string.Empty;
-
+			string tabs = string.Empty;
 			for( uint i = 0; i < tab; i++ )
 				tabs += '\t';
 
@@ -317,10 +324,15 @@ namespace SFInput
 			}
 
 			sb.Append( tabs ); sb.Append( "</action>" );
-
 			return sb.ToString();
 		}
 
+		/// <summary>
+		///   Returns an enumerator that iterates through the collection.
+		/// </summary>
+		/// <returns>
+		///   An enumerator that can be used to iterate through the collection.
+		/// </returns>
 		public IEnumerator<InputMap> GetEnumerator()
 		{
 			return ( (IEnumerable<InputMap>)Inputs ).GetEnumerator();

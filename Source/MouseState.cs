@@ -27,12 +27,38 @@ using SFML.Window;
 namespace SFInput
 {
 	/// <summary>
+	///   Mouse input axies.
+	/// </summary>
+	public enum MouseAxis
+	{
+		/// <summary>
+		///   Horizontal position.
+		/// </summary>
+		XPosition,
+		/// <summary>
+		///   Vertical position.
+		/// </summary>
+		YPosition,
+
+		/// <summary>
+		///   Axis count.
+		/// </summary>
+		COUNT
+	}
+
+	/// <summary>
 	///   Represents the state of the mouse at a given moment.
 	/// </summary>
 	public class MouseState : ICloneable
 	{
+		/// <summary>
+		///   Button count.
+		/// </summary>
 		public const uint ButtonCount = (uint)Mouse.Button.ButtonCount;
-		public const uint AxisCount   = (uint)MouseAxis.COUNT;
+		/// <summary>
+		///   Axis count.
+		/// </summary>
+		public const uint AxisCount = (uint)MouseAxis.COUNT;
 
 		/// <summary>
 		///   Construct a new state.

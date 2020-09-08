@@ -30,24 +30,78 @@ namespace SFInput
 	/// </summary>
 	public enum XButton
 	{
+		/// <summary>
+		///   A button.
+		/// </summary>
 		A,
+		/// <summary>
+		///   B button.
+		/// </summary>
 		B,
+		/// <summary>
+		///   X button.
+		/// </summary>
 		X,
+		/// <summary>
+		///   Y button.
+		/// </summary>
 		Y,
+		/// <summary>
+		///   Start button.
+		/// </summary>
 		Start,
+		/// <summary>
+		///   Back button.
+		/// </summary>
 		Back,
+		/// <summary>
+		///   Guide button.
+		/// </summary>
 		Guide,
+		/// <summary>
+		///   Left bumper.
+		/// </summary>
 		LB,
+		/// <summary>
+		///   Right bumper.
+		/// </summary>
 		RB,
+		/// <summary>
+		///   Left trigger.
+		/// </summary>
 		LT,
+		/// <summary>
+		///   Right trigger.
+		/// </summary>
 		RT,
+		/// <summary>
+		///   Left stick click.
+		/// </summary>
 		LS,
+		/// <summary>
+		///   Right stick click.
+		/// </summary>
 		RS,
+		/// <summary>
+		///   DPad up.
+		/// </summary>
 		DPadUp,
+		/// <summary>
+		///   DPad down.
+		/// </summary>
 		DPadDown,
+		/// <summary>
+		///   DPad left.
+		/// </summary>
 		DPadLeft,
+		/// <summary>
+		///   DPad right.
+		/// </summary>
 		DPadRight,
 
+		/// <summary>
+		///   Button count.
+		/// </summary>
 		COUNT
 	}
 	/// <summary>
@@ -55,14 +109,38 @@ namespace SFInput
 	/// </summary>
 	public enum XAxis
 	{
+		/// <summary>
+		///   Left stick horizontal axis.
+		/// </summary>
 		LeftStickX,
+		/// <summary>
+		///   Left stick vertical axis.
+		/// </summary>
 		LeftStickY,
+		/// <summary>
+		///   Right stick horizontal axis.
+		/// </summary>
 		RightStickX,
+		/// <summary>
+		///   Right stick vertical axis.
+		/// </summary>
 		RightStickY,
+		/// <summary>
+		///   Left trigger.
+		/// </summary>
 		LeftTrigger,
+		/// <summary>
+		///   Right trigger.
+		/// </summary>
 		RightTrigger,
+		/// <summary>
+		///   Both triggers.
+		/// </summary>
 		Triggers,
 
+		/// <summary>
+		///   Axis count.
+		/// </summary>
 		COUNT
 	}
 
@@ -71,8 +149,14 @@ namespace SFInput
 	/// </summary>
 	public class JoystickState : ICloneable
 	{
+		/// <summary>
+		///   Button count.
+		/// </summary>
 		public const uint ButtonCount = (uint)XButton.COUNT;
-		public const uint AxisCount   = (uint)XAxis.COUNT;
+		/// <summary>
+		///   Axis count.
+		/// </summary>
+		public const uint AxisCount = (uint)XAxis.COUNT;
 
 		/// <summary>
 		///   Constructs a new state.

@@ -30,6 +30,9 @@ namespace SFInput
 	/// </summary>
 	public class KeyboardState : ICloneable
 	{
+		/// <summary>
+		///   Key count.
+		/// </summary>
 		public const uint KeyCount = (uint)Keyboard.Key.KeyCount;
 		
 		/// <summary>

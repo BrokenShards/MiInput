@@ -27,17 +27,6 @@ using SFML.Window;
 namespace SFInput
 {
 	/// <summary>
-	///   Mouse input axies.
-	/// </summary>
-	public enum MouseAxis
-	{
-		XPosition,
-		YPosition,
-
-		COUNT
-	}
-
-	/// <summary>
 	///   Manages the state of the Mouse.
 	/// </summary>
 	public class MouseManager

@@ -31,6 +31,7 @@
     <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <UseVSHostingProcess>true</UseVSHostingProcess>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="sfmlnet-audio-2, Version=2.4.0.0, Culture=neutral, processorArchitecture=MSIL">
@@ -77,9 +78,6 @@
     <None Include="licence.md" />
     <None Include="packages.config" />
     <None Include="readme.md" />
-  </ItemGroup>
-  <ItemGroup>
-    <Content Include="input.xml" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="Dependencies\SharpID\SharpID.csproj">

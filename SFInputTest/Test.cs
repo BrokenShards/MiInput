@@ -20,6 +20,7 @@
 //
 ////////////////////////////////////////////////////////////////////////////////
 
+using System;
 using System.IO;
 
 using SFML.Graphics;
@@ -28,31 +29,36 @@ using SFML.Window;
 using SFInput;
 using SharpLogger;
 
+using Action = SFInput.Action;
+
 namespace SFInputTest
 {
 	static class Test
 	{
 		const string InputPath = "input.xml";
 
-		static int Main( string[] args )
+		private static int Main( string[] args )
 		{
-			int val = RunTests();
-			System.Console.ReadLine();
+			int val = RunTests( args );
+			Console.ReadLine();
 			return val;
 		}
 
-		static int RunTests()
+		private static int RunTests( string[] args )
 		{
 			if( !ActionTest() )
 				return Logger.LogReturn( "Action test failed.", -1, LogType.Error );
 			if( !WindowTest() )
 				return Logger.LogReturn( "Window test failed.", -1, LogType.Error );
 
+			if( Example.RunExample() != 0 )
+				return Logger.LogReturn( "Run example failed.", -1, LogType.Error );
+
 			Logger.Log( "Testing successful." );
 			return 0;
 		}
 
-		static bool ActionTest()
+		private static bool ActionTest()
 		{
 			Action act = new Action( "test" );
 			act.Inputs.Add( new InputMap( InputDevice.Joystick, InputType.Button, "0", "1" ) );
@@ -90,8 +96,7 @@ namespace SFInputTest
 
 			return true;
 		}
-
-		static bool WindowTest()
+		private static bool WindowTest()
 		{
 			Input.Manager.Update();
 
@@ -137,7 +142,7 @@ namespace SFInputTest
 			return true;
 		}
 
-		private static void OnClose( object sender, System.EventArgs e )
+		private static void OnClose( object sender, EventArgs e )
 		{
 			( sender as RenderWindow ).Close();
 		}

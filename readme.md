@@ -1,70 +1,12 @@
 # SFInput
 A basic input manager for use with SFML.Net.
 
+SFInput is a simple action based input manager using SFML.Net for mouse and keyboard input and XInput for joystick 
+input. SFInput is written entirely for my own usage in my own projects but I am open to fixing any issues that may be
+found.
+
 ## Usage
-Use `Input.Manager` to query input. `Update` must be called each frame before input logic.
-
-```
-using System;
-using SFML.Graphics;
-using SFML.Window;
-using SFInput;
-
-static class Program
-{
-	static void Main( string args[] )
-	{
-		using( RenderWindow window = new RenderWindow( new VideoMode( 640, 480 ), "SFInput", Styles.Close ) )
-		{
-			window.Closed += OnClose;
-
-			// Create action.
-			Action act = new Action( "horizontal" );
-			act.Inputs.Add( new InputMap( InputDevice.Keyboard, InputType.Button, "A", "D" ) );
-
-			// Add action to action set.
-			if( !Input.Manager.Actions.Add( act ) )
-				return Logger.LogReturn( "Unable to add valid action to action set.", false, LogType.Error );
-
-			// Retrieve assigned action.
-			Action a = Input.Manager.Actions[ "horizontal" ];
-			if( a == null )
-				return Logger.LogReturn( "Unable to retrieve previously added action from the action set.", false, LogType.Error );
-
-			while( window.IsOpen )
-			{
-				window.DispatchEvents();
-
-				// Update input managers.
-				Input.Manager.Update();
-
-				float h = Input.Manager.Actions[ "horizontal" ].Value;
-
-				if( Math.Abs( h ) > 0.02f )
-					System.Console.WriteLine( "Horizontal: " + h.ToString() + "." );
-
-				if( Input.Manager.JustPressed( InputDevice.Keyboard, "Space" ) )
-					System.Console.WriteLine( "Space just pressed." );
-				
-				if( Input.Manager.JustPressed( InputDevice.Mouse, "Left" ) )
-					System.Console.WriteLine( "Left mouse button just clicked." );
-				
-				if( Input.Manager.JustPressed( InputDevice.Joystick, "0" ) )
-					System.Console.WriteLine( "Joystick button 0 just pressed." );
-
-				window.Clear();
-				window.Display();
-			}
-		}
-	}
-
-	static void OnClose( object sender, System.EventArgs e )
-	{
-		( sender as RenderWindow ).Close();
-	}
-}
-
-```
+See `SFInputTest/Example.cs" for example code and usage.
 
 ## TO-DO
 ### Possibilities

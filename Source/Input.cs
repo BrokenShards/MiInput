@@ -34,7 +34,7 @@ namespace SFInput
 		/// <summary>
 		///   Maximum number of joysticks that can be connected at once.
 		/// </summary>
-		public const uint  MaxJoysticks       = 4;
+		public const uint MaxJoysticks = 4;
 		/// <summary>
 		///   Minimum axis value that registers a button press.
 		/// </summary>

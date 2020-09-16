@@ -23,7 +23,6 @@
 using System;
 using System.Text;
 using System.Xml;
-using SFML.Window;
 using SharpLogger;
 
 namespace SFInput

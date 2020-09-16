@@ -1,9 +1,9 @@
 # SFInput
-A basic input manager for use with SFML.Net.
+A basic input manager for use with SFML.Net and XInput.
 
 SFInput is a simple action based input manager using SFML.Net for mouse and keyboard input and XInput for joystick 
-input. SFInput is written entirely for my own usage in my own projects but I am open to fixing any issues that may be
-found.
+input. SFInput was written entirely for my own usage in my own projects, but if anyone else ends up using it, I am open
+to suggestions and will attempt to fix any issues.
 
 ## Usage
 See `SFInputTest/Example.cs" for example code and usage.

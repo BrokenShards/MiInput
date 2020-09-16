@@ -40,8 +40,8 @@ namespace SFInput
 		/// </summary>
 		public Action()
 		{
-			Name   = string.Empty;
-			Inputs = new List<InputMap>();
+			Name     = string.Empty;
+			m_inputs = new List<InputMap>();
 		}
 		/// <summary>
 		///   Copy constructor.
@@ -51,11 +51,11 @@ namespace SFInput
 		/// </param>
 		public Action( Action a )
 		{
-			Name   = new string( a.Name.ToCharArray() );
-			Inputs = a.Inputs.Count > 0 ? new List<InputMap>( a.Inputs.Count ) : new List<InputMap>();
+			Name     = new string( a.Name.ToCharArray() );
+			m_inputs = a.m_inputs.Count > 0 ? new List<InputMap>( a.m_inputs.Count ) : new List<InputMap>();
 
-			for( int i = 0; i < a.Inputs.Count; i++ )
-				Inputs[ i ] = new InputMap( a.Inputs[ i ] );
+			for( int i = 0; i < a.m_inputs.Count; i++ )
+				m_inputs[ i ] = new InputMap( a.m_inputs[ i ] );
 		}
 		/// <summary>
 		///   Constructs the object with the given positive name.
@@ -65,8 +65,8 @@ namespace SFInput
 		/// </param>
 		public Action( string name )
 		{
-			Name   = string.IsNullOrWhiteSpace( name ) ? string.Empty : name;
-			Inputs = new List<InputMap>();
+			Name     = string.IsNullOrWhiteSpace( name ) ? string.Empty : name;
+			m_inputs = new List<InputMap>();
 		}
 
 		/// <summary>
@@ -79,11 +79,181 @@ namespace SFInput
 		}
 
 		/// <summary>
-		///   Mapped inputs.
+		///   If no inputs are mapped.
 		/// </summary>
-		public List<InputMap> Inputs
+		public bool Empty
 		{
-			get; private set;
+			get { return Count == 0; }
+		}
+		/// <summary>
+		///   The amount of mapped inputs.
+		/// </summary>
+		public int Count
+		{
+			get { return m_inputs.Count; }
+		}
+
+		/// <summary>
+		///   Accesses the input map at the given index.
+		/// </summary>
+		/// <param name="index">
+		///   The input map index.
+		/// </param>
+		/// <returns>
+		///   The input map at the given index.
+		/// </returns>
+		public InputMap this[ uint index ]
+		{
+			get { return Get( index ); }
+		}
+
+		/// <summary>
+		///   If the action already contains the input map.
+		/// </summary>
+		/// <param name="map">
+		///   The input map.
+		/// </param>
+		/// <returns>
+		///   True if the action already contains the input map.
+		/// </returns>
+		public bool Contains( InputMap map )
+		{
+			if( map == null || !map.IsValid )
+				return false;
+
+			foreach( InputMap m in m_inputs )
+				if( map == m )
+					return true;
+
+			return false;
+		}
+
+		/// <summary>
+		///   Gets the input map at the given index.
+		/// </summary>
+		/// <param name="index">
+		///   The input map index.
+		/// </param>
+		/// <returns>
+		///   The input map at the given index or null if the index is out of range.
+		/// </returns>
+		public InputMap Get( uint index )
+		{
+			if( index >= Count )
+				return null;
+
+			return m_inputs[ (int)index ];
+		}
+
+		/// <summary>
+		///   Replaces an existing input map.
+		/// </summary>
+		/// <param name="index">
+		///   The input map index.
+		/// </param>
+		/// <param name="map">
+		///   The input map.
+		/// </param>
+		/// <returns>
+		///   True if index is within range, map is valid and does not collide with any existing input maps, and the
+		///   existing input map was replaces with map, otherwise false.
+		/// </returns>
+		public bool Set( uint index, InputMap map )
+		{
+			if( map == null || !map.IsValid || index >= Count )
+				return false;
+
+			for( int i = 0; i < Count; i++ )
+				if( i != index && InputMap.Collides( map, m_inputs[ i ] ) )
+					return false;
+
+			m_inputs[ (int)index ] = map;
+			return true;
+		}
+		/// <summary>
+		///   Adds an input map.
+		/// </summary>
+		/// <param name="map">
+		///   The input map.
+		/// </param>
+		/// <returns>
+		///   True if the input map is valid, does not collide with any existing input maps, and was added successfully.
+		/// </returns>
+		public bool Add( InputMap map )
+		{
+			if( map == null || !map.IsValid )
+				return false;
+
+			for( int i = 0; i < Count; i++ )
+				if( InputMap.Collides( map, m_inputs[ i ] ) )
+					return false;
+
+			m_inputs.Add( map );
+			return true;
+		}
+		/// <summary>
+		///   Adds several input maps and returns how many were successful.
+		/// </summary>
+		/// <param name="maps">
+		///   List if input maps.
+		/// </param>
+		/// <returns>
+		///   The amount of successfully added input maps.
+		/// </returns>
+		public uint Add( params InputMap[] maps )
+		{
+			if( maps == null )
+				return 0;
+
+			uint counter = 0;
+
+			foreach( InputMap m in maps )
+				if( Add( m ) )
+					counter++;
+
+			return counter;
+		}
+
+		/// <summary>
+		///   Removes the input map at the given index.
+		/// </summary>
+		/// <param name="index">
+		///   The input map index.
+		/// </param>
+		/// <returns>
+		///   If the index is valid and the input map was removed successfully.
+		/// </returns>
+		public bool Remove( uint index )
+		{
+			if( index >= Count )
+				return false;
+
+			m_inputs.RemoveAt( (int)index );
+			return true;
+		}
+		/// <summary>
+		///   Removes the given input map.
+		/// </summary>
+		/// <param name="map">
+		///   The input map.
+		/// </param>
+		/// <returns>
+		///   If the input map existed and was removed successfully.
+		/// </returns>
+		public bool Remove( InputMap map )
+		{
+			if( map == null || !map.IsValid )
+				return false;
+
+			return m_inputs.Remove( map );
+		}
+
+		/// <summary>
+		///   Removes as input maps.
+		/// </summary>
+		public void Clear()
+		{
+			m_inputs.Clear();
 		}
 
 		/// <summary>
@@ -93,12 +263,12 @@ namespace SFInput
 		{
 			get
 			{
-				if( Inputs == null || Inputs.Count == 0 )
+				if( m_inputs == null || m_inputs.Count == 0 )
 					return 0.0f;
 								
-				for( int i = 0; i < Inputs.Count; i++ )
+				for( int i = 0; i < m_inputs.Count; i++ )
 				{
-					InputMap map = Inputs[ i ];
+					InputMap map = m_inputs[ i ];
 
 					if( !map.IsValid )
 						continue;
@@ -106,20 +276,20 @@ namespace SFInput
 					if( map.Type == InputType.Axis )
 					{
 						float v = map.Device == InputDevice.Mouse ?
-						          Input.Manager.Mouse.GetAxis( Inputs[ i ].Value ) :
-								  Input.Manager.Joystick[ Input.Manager.FirstJoystick ].GetAxis( Inputs[ i ].Value );
+						          Input.Manager.Mouse.GetAxis( m_inputs[ i ].Value ) :
+								  Input.Manager.Joystick[ Input.Manager.FirstJoystick ].GetAxis( m_inputs[ i ].Value );
 
 						if( v != 0.0f )
 							return map.Invert ? -v : v;
 					}
 					else if( map.Type == InputType.Button )
 					{
-						bool p = map.Device == InputDevice.Keyboard ? Input.Manager.Keyboard.IsPressed( Inputs[ i ].Value ) :
-						       ( map.Device == InputDevice.Mouse    ? Input.Manager.Mouse.IsPressed( Inputs[ i ].Value ) :
-						       ( map.Device == InputDevice.Joystick ? Input.Manager.Joystick[ Input.Manager.FirstJoystick ].IsPressed( Inputs[ i ].Value ) : false ) );
-						bool n = map.Device == InputDevice.Keyboard ? Input.Manager.Keyboard.IsPressed( Inputs[ i ].Negative ) :
-							   ( map.Device == InputDevice.Mouse    ? Input.Manager.Mouse.IsPressed( Inputs[ i ].Negative ) :
-							   ( map.Device == InputDevice.Joystick ? Input.Manager.Joystick[ Input.Manager.FirstJoystick ].IsPressed( Inputs[ i ].Negative ) : false ) );
+						bool p = map.Device == InputDevice.Keyboard ? Input.Manager.Keyboard.IsPressed( m_inputs[ i ].Value ) :
+						       ( map.Device == InputDevice.Mouse    ? Input.Manager.Mouse.IsPressed( m_inputs[ i ].Value ) :
+						       ( map.Device == InputDevice.Joystick ? Input.Manager.Joystick[ Input.Manager.FirstJoystick ].IsPressed( m_inputs[ i ].Value ) : false ) );
+						bool n = map.Device == InputDevice.Keyboard ? Input.Manager.Keyboard.IsPressed( m_inputs[ i ].Negative ) :
+							   ( map.Device == InputDevice.Mouse    ? Input.Manager.Mouse.IsPressed( m_inputs[ i ].Negative ) :
+							   ( map.Device == InputDevice.Joystick ? Input.Manager.Joystick[ Input.Manager.FirstJoystick ].IsPressed( m_inputs[ i ].Negative ) : false ) );
 
 						if( ( p && n ) || ( !p && !n ) )
 							continue;
@@ -163,7 +333,7 @@ namespace SFInput
 		{
 			get
 			{
-				foreach( InputMap map in Inputs )
+				foreach( InputMap map in m_inputs )
 				{
 					bool pos = false, 
 					     neg = false;
@@ -197,7 +367,7 @@ namespace SFInput
 		{
 			get
 			{
-				foreach( InputMap map in Inputs )
+				foreach( InputMap map in m_inputs )
 				{
 					if( Input.Manager.JustPressed( map.Device, map.Value ) && !Input.Manager.JustPressed( map.Device, map.Negative ) )
 						return true;
@@ -213,7 +383,7 @@ namespace SFInput
 		{
 			get
 			{
-				foreach( InputMap map in Inputs )
+				foreach( InputMap map in m_inputs )
 				{
 					if( Input.Manager.JustReleased( map.Device, map.Value ) && !Input.Manager.JustReleased( map.Device, map.Negative ) )
 						return true;
@@ -230,16 +400,16 @@ namespace SFInput
 		{
 			get
 			{
-				if( !Naming.IsValid( Name ) || Inputs == null || Inputs.Count == 0 )
+				if( !Naming.IsValid( Name ) || m_inputs == null || m_inputs.Count == 0 )
 					return false;
 
-				for( int i = 0; i < Inputs.Count - 1; i++ )
+				for( int i = 0; i < m_inputs.Count - 1; i++ )
 				{
-					if( !Inputs[ i ].IsValid )
+					if( !m_inputs[ i ].IsValid )
 						return false;
 
-					for( int j = i + 1; j < Inputs.Count; j++ )
-						if( InputMap.Collides( Inputs[ i ], Inputs[ j ] ) )
+					for( int j = i + 1; j < m_inputs.Count; j++ )
+						if( InputMap.Collides( m_inputs[ i ], m_inputs[ j ] ) )
 							return false;
 				}
 
@@ -279,7 +449,7 @@ namespace SFInput
 					if( !map.LoadFromXml( n ) )
 						return false;
 
-					Inputs.Add( map );
+					m_inputs.Add( map );
 				}
 			}
 
@@ -315,7 +485,7 @@ namespace SFInput
 
 			sb.Append( tabs ); sb.Append( "<action name=\"" ); sb.Append( Name ); sb.Append( "\">\n" );
 
-			foreach( InputMap p in Inputs )
+			foreach( InputMap p in m_inputs )
 			{
 				if( p == null )
 					continue;
@@ -335,13 +505,14 @@ namespace SFInput
 		/// </returns>
 		public IEnumerator<InputMap> GetEnumerator()
 		{
-			return ( (IEnumerable<InputMap>)Inputs ).GetEnumerator();
+			return ( (IEnumerable<InputMap>)m_inputs ).GetEnumerator();
 		}
 		IEnumerator IEnumerable.GetEnumerator()
 		{
-			return ( (IEnumerable<InputMap>)Inputs ).GetEnumerator();
+			return ( (IEnumerable<InputMap>)m_inputs ).GetEnumerator();
 		}
 
 		private string m_name;
+		private List<InputMap> m_inputs;
 	}
 }

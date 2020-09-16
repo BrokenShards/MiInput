@@ -200,6 +200,14 @@ namespace SFInput
 		}
 
 		/// <summary>
+		///   Removes all actions from the set.
+		/// </summary>
+		public void Clear()
+		{
+			m_actions.Clear();
+		}
+
+		/// <summary>
 		///   Loads the set from an xml file.
 		/// </summary>
 		/// <param name="path">

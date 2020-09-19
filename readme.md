@@ -13,6 +13,12 @@ See `SFInputTest/Example.cs" for example code and usage.
 - Design a simple GUI application for creating/modifying action sets.
 
 ## Changelog
+### Version 0.4.0
+- Actions now privately contain their input maps and have functions for managing them in order to prevent adding input
+  maps that are either inavlid or collide with existing input maps.
+- Action sets now have the `Clear()` function for removing all actions at once.
+- Added example code in `SFInputTest/Example.cs` and updated tests.
+
 ### Version 0.3.1
 - Now only XInput is used for the joystick backend making action loading, saving and usage more consistent.
 

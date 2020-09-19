@@ -28,8 +28,8 @@ namespace SFInputTest
 					// Create action.
 					{
 						Action hor = new Action( "horizontal" );
-						hor.Inputs.Add( new InputMap( InputDevice.Joystick, InputType.Axis, "LeftStickX" ) );
-						hor.Inputs.Add( new InputMap( InputDevice.Keyboard, InputType.Button, "D", "A" ) );
+						hor.Add( new InputMap( InputDevice.Joystick, InputType.Axis, "LeftStickX" ) );
+						hor.Add( new InputMap( InputDevice.Keyboard, InputType.Button, "D", "A" ) );
 
 						// Add action to action set, replacing an already existing action with the same ID.
 						if( !Input.Manager.Actions.Add( hor, true ) )

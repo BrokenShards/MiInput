@@ -68,6 +68,22 @@ namespace SFInput
 			Name     = string.IsNullOrWhiteSpace( name ) ? string.Empty : name;
 			m_inputs = new List<InputMap>();
 		}
+		/// <summary>
+		///   Constructs the object with the given positive name and input map.
+		/// </summary>
+		/// <param name="name">
+		///   The positive name.
+		/// </param>
+		/// <param name="map">
+		///   The input map.
+		/// </param>
+		public Action( string name, InputMap map )
+		{
+			Name = string.IsNullOrWhiteSpace( name ) ? string.Empty : name;
+			m_inputs = new List<InputMap>();
+
+			Add( map );
+		}
 
 		/// <summary>
 		///   Action name.
@@ -319,7 +335,7 @@ namespace SFInput
 			get { return Value >= Input.AxisPressThreshold; }
 		}
 		/// <summary>
-		///   If the mapped inputs are classed as negative.
+		///   If the mapped inputs are classed as negative/pressed.
 		/// </summary>
 		public bool IsNegative
 		{

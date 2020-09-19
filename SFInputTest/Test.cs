@@ -61,7 +61,7 @@ namespace SFInputTest
 		private static bool ActionTest()
 		{
 			Action act = new Action( "test" );
-			act.Inputs.Add( new InputMap( InputDevice.Joystick, InputType.Button, "0", "1" ) );
+			act.Add( new InputMap( InputDevice.Joystick, InputType.Button, "0", "1" ) );
 
 			if( !Input.Manager.Actions.Add( act ) )
 				return Logger.LogReturn( "Unable to add valid action to action set.", false, LogType.Error );
@@ -101,7 +101,7 @@ namespace SFInputTest
 			Input.Manager.Update();
 
 			Action test = new Action( "test" );
-			test.Inputs.Add( new InputMap( InputDevice.Joystick, InputType.Button, "A", "B" ) );
+			test.Add( new InputMap( InputDevice.Joystick, InputType.Button, "A", "B" ) );
 
 			if( !Input.Manager.Actions.Add( test, true ) )
 				return Logger.LogReturn( "Unable to add test action to input manager.", false, LogType.Error );

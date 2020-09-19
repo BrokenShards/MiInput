@@ -45,7 +45,9 @@ namespace SFInput
 		/// <summary>
 		///   Joystick/Controller input.
 		/// </summary>
-		Joystick
+		Joystick,
+
+		COUNT
 	}
 
 	/// <summary>
@@ -61,7 +63,9 @@ namespace SFInput
 		/// <summary>
 		///   Axis value.
 		/// </summary>
-		Axis
+		Axis,
+
+		COUNT
 	}	
 
 	/// <summary>

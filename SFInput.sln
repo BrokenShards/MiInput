@@ -25,15 +25,6 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SFInputTest", "SFInputTest\
 		{F0D47DDD-7B9E-40D7-BD38-B9B2636BE6BD} = {F0D47DDD-7B9E-40D7-BD38-B9B2636BE6BD}
 	EndProjectSection
 EndProject
-<<<<<<< Updated upstream
-=======
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SFInputTool", "SFInputTool\SFInputTool.csproj", "{4F918C66-1368-4B73-B772-7F45B292C2AB}"
-	ProjectSection(ProjectDependencies) = postProject
-		{C06CD8DC-5A9E-4215-877D-B8AFC9B07A63} = {C06CD8DC-5A9E-4215-877D-B8AFC9B07A63}
-		{F0D47DDD-7B9E-40D7-BD38-B9B2636BE6BD} = {F0D47DDD-7B9E-40D7-BD38-B9B2636BE6BD}
-	EndProjectSection
-EndProject
->>>>>>> Stashed changes
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU

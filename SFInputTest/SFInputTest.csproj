@@ -48,6 +48,14 @@
     <Reference Include="sfmlnet-window-2, Version=2.4.0.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\Graphnode.SFML.Net.2.4\lib\sfmlnet-window-2.dll</HintPath>
     </Reference>
+    <Reference Include="SharpID, Version=0.1.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\Dependencies\SharpID\bin\Release\SharpID.dll</HintPath>
+    </Reference>
+    <Reference Include="SharpLogger, Version=0.1.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\Dependencies\SharpLogger\bin\Release\SharpLogger.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Xml.Linq" />
@@ -70,14 +78,6 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Dependencies\SharpID\SharpID.csproj">
-      <Project>{c06cd8dc-5a9e-4215-877d-b8afc9b07a63}</Project>
-      <Name>SharpID</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\Dependencies\SharpLogger\SharpLogger.csproj">
-      <Project>{f0d47ddd-7b9e-40d7-bd38-b9b2636be6bd}</Project>
-      <Name>SharpLogger</Name>
-    </ProjectReference>
     <ProjectReference Include="..\SFInput.csproj">
       <Project>{0e738931-da83-48e2-9015-3ac423fb967a}</Project>
       <Name>SFInput</Name>

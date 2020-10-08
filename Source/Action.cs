@@ -416,7 +416,7 @@ namespace SFInput
 		{
 			get
 			{
-				if( !Naming.IsValid( Name ) || m_inputs == null || m_inputs.Count == 0 )
+				if( !Naming.IsValid( Name ) || m_inputs == null )
 					return false;
 
 				for( int i = 0; i < m_inputs.Count - 1; i++ )

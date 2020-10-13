@@ -5,6 +5,12 @@ SFInput is a simple action based input manager using SFML.Net for mouse and keyb
 input. SFInput was written entirely for my own usage in my own projects, but if anyone else ends up using it, I am open
 to suggestions and will attempt to fix any issues.
 
+## Dependencies
+- SFML.Net `https://github.com/graphnode/SFML.Net.git`
+- SharpID `https://github.com/ShardTheBroken/SharpID.git`
+- SharpLogger `https://github.com/ShardTheBroken/SharpLogger.git`
+- XInputDotNetPure `https://github.com/speps/XInputDotNet.git`
+
 ## Usage
 See `SFInputTest/Example.cs" for example code and usage.
 
@@ -13,6 +19,10 @@ See `SFInputTest/Example.cs" for example code and usage.
 - Design a simple GUI application for creating/modifying action sets.
 
 ## Changelog
+### Version 0.5.0
+- Dependencies have been updated and are now included as binary files rather than as git submodules. Dependency source
+  is now clearly shown in the readme.
+
 ### Version 0.4.0
 - Actions now privately contain their input maps and have functions for managing them in order to prevent adding input
   maps that are either inavlid or collide with existing input maps.

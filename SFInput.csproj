@@ -82,7 +82,6 @@
   <ItemGroup>
     <None Include=".gitattributes" />
     <None Include=".gitignore" />
-    <None Include=".gitmodules" />
     <None Include="licence.md" />
     <None Include="packages.config" />
     <None Include="readme.md" />

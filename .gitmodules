@@ -1,6 +1,0 @@
-[submodule "Dependencies/SharpID"]
-	path = Dependencies/SharpID
-	url = https://github.com/ShardTheBroken/SharpID.git
-[submodule "Dependencies/SharpLogger"]
-	path = Dependencies/SharpLogger
-	url = https://github.com/ShardTheBroken/SharpLogger.git

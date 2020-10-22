@@ -146,6 +146,9 @@ namespace SFInput
 			get; private set;
 		}
 
+		/// <summary>
+		///   The index of the first connected joystick.
+		/// </summary>
 		public uint FirstJoystick
 		{
 			get { return Joystick[ 0 ].FirstConnected; }

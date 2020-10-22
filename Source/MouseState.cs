@@ -155,6 +155,9 @@ namespace SFInput
 			return new Vector2f( position.X / size.X, position.Y / size.Y );
 		}
 
+		/// <summary>
+		///   Updates values to the current state of the mouse.
+		/// </summary>
 		public void Update()
 		{
 			Position = Mouse.GetPosition();
@@ -165,6 +168,9 @@ namespace SFInput
 			m_axis[ (uint)MouseAxis.XPosition ] = Position.X;
 			m_axis[ (uint)MouseAxis.YPosition ] = Position.Y;
 		}
+		/// <summary>
+		///   Resets all values.
+		/// </summary>
 		public void Reset()
 		{
 			if( m_button != null )
@@ -209,6 +215,15 @@ namespace SFInput
 
 			return IsPressed( (uint)but );
 		}
+		/// <summary>
+		///   If the button is pressed.
+		/// </summary>
+		/// <param name="but">
+		///   The button to check.
+		/// </param>
+		/// <returns>
+		///   True if the button is valid and is pressed, otherwise false.
+		/// </returns>
 		public bool IsPressed( string but )
 		{
 			if( !MouseManager.IsButton( but ) )
@@ -249,6 +264,15 @@ namespace SFInput
 
 			return GetAxis( (uint)axis );
 		}
+		/// <summary>
+		///   The value of the axis.
+		/// </summary>
+		/// <param name="axis">
+		///   The axis to check.
+		/// </param>
+		/// <returns>
+		///   The value of the axis if it is valid, otherwise 0.0.
+		/// </returns>
 		public float GetAxis( string axis )
 		{
 			if( !MouseManager.IsAxis( axis ) )
@@ -306,6 +330,12 @@ namespace SFInput
 			return ( bidir ? Math.Abs( GetAxis( axis ) ) : GetAxis( axis ) ) >= Input.AxisPressThreshold;
 		}
 
+		/// <summary>
+		///   Deep coppies the object.
+		/// </summary>
+		/// <returns>
+		///   A deep copy of the object.
+		/// </returns>
 		public object Clone()
 		{
 			return new MouseState( this );

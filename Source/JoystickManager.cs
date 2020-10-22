@@ -416,7 +416,7 @@ namespace SFInput
 		/// </param>
 		/// <returns>
 		///   The difference in value between the last to update calls of the given axis from the given joystick player
-		///   index. Will also return zero if <paramref name="axis"/> is out of range.
+		///   index. Will also return zero if <paramref name="ax"/> is out of range.
 		/// </returns>
 		public float AxisDelta( uint ax )
 		{
@@ -429,8 +429,9 @@ namespace SFInput
 		/// <param name="ax">
 		///   The axis to check.
 		/// </param>
+		/// <returns>
 		///   The difference in value between the last to update calls of the given axis from the given joystick player
-		///   index. Will also return zero if <paramref name="axis"/> is out of range.
+		///   index. Will also return zero if <paramref name="ax"/> is out of range.
 		/// </returns>
 		public float AxisDelta( string ax )
 		{

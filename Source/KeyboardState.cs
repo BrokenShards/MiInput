@@ -128,6 +128,12 @@ namespace SFInput
 			return IsPressed( (uint)KeyboardManager.ToKey( key ) );
 		}
 
+		/// <summary>
+		///   Deep coppies the object.
+		/// </summary>
+		/// <returns>
+		///   A deep copy of the object.
+		/// </returns>
 		public object Clone()
 		{
 			return new KeyboardState( this );

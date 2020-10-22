@@ -301,6 +301,15 @@ namespace SFInput
 
 			return IsPressed( (uint)but );
 		}
+		/// <summary>
+		///   If the button is pressed.
+		/// </summary>
+		/// <param name="but">
+		///   The button to check.
+		/// </param>
+		/// <returns>
+		///   True if the button is valid and is pressed, otherwise false.
+		/// </returns>
 		public bool IsPressed( string but )
 		{
 			if( !JoystickManager.IsButton( but ) )
@@ -341,6 +350,15 @@ namespace SFInput
 
 			return GetAxis( (uint)axis );
 		}
+		/// <summary>
+		///   The value of the axis.
+		/// </summary>
+		/// <param name="axis">
+		///   The axis to check.
+		/// </param>
+		/// <returns>
+		///   The value of the axis if it is valid, otherwise 0.0.
+		/// </returns>
 		public float GetAxis( string axis )
 		{
 			if( !JoystickManager.IsAxis( axis ) )
@@ -398,13 +416,25 @@ namespace SFInput
 			return ( bidir ? Math.Abs( GetAxis( axis ) ) : GetAxis( axis ) ) >= Input.AxisPressThreshold;
 		}
 
+		/// <summary>
+		///   Deep coppies the object.
+		/// </summary>
+		/// <returns>
+		///   A deep copy of the object.
+		/// </returns>
 		public object Clone()
 		{
 			return new JoystickState( this );
 		}
 
 		private   uint    m_player;
+		/// <summary>
+		///   Array containing axis values.
+		/// </summary>
 		protected float[] m_axis;
+		/// <summary>
+		///   Array containing buttin values.
+		/// </summary>
 		protected bool[]  m_button;
 	}
 }

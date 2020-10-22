@@ -7,8 +7,8 @@ to suggestions and will attempt to fix any issues.
 
 ## Dependencies
 - SFML.Net `https://github.com/graphnode/SFML.Net.git`
-- SharpID `https://github.com/ShardTheBroken/SharpID.git`
-- SharpLogger `https://github.com/ShardTheBroken/SharpLogger.git`
+- SharpID `https://github.com/BrokenShards/SharpID.git`
+- SharpLogger `https://github.com/BrokenShards/SharpLogger.git`
 - XInputDotNetPure `https://github.com/speps/XInputDotNet.git`
 
 ## Usage
@@ -19,6 +19,10 @@ See `SFInputTest/Example.cs` for example code and usage.
 - Design a simple GUI application for creating/modifying action sets.
 
 ## Changelog
+
+### Version 0.5.1
+- Now the xml documentation is built with the binary and is included in releases.
+
 ### Version 0.5.0
 - Dependencies have been updated and are now included as binary files rather than as git submodules. Dependency source
   is now clearly shown in the readme.

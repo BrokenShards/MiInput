@@ -34,14 +34,24 @@
               Handles logging.
             </summary>
         </member>
-        <member name="P:SharpLogger.Logger.HideLogs">
+        <member name="P:SharpLogger.Logger.LogToConsole">
             <summary>
-              If enabled, logs will not be output to the stream.
+              If logs should be displayed in the console.
+            </summary>
+        </member>
+        <member name="P:SharpLogger.Logger.LogToFile">
+            <summary>
+              If logs should be written to file.
+            </summary>
+        </member>
+        <member name="P:SharpLogger.Logger.LogPath">
+            <summary>
+              File path to log file.
             </summary>
         </member>
         <member name="M:SharpLogger.Logger.Log(System.String,SharpLogger.LogType)">
             <summary>
-              Logs a message to the log stream with the given log type.
+              Logs a message with the given log type.
             </summary>
             <param name="msg">
               The log message.
@@ -66,7 +76,9 @@
             <param name="l">
               The log type.
             </param>
-            <returns></returns>
+            <returns>
+              Returns <paramref name="val"/>.
+            </returns>
         </member>
     </members>
 </doc>

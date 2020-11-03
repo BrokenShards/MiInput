@@ -98,6 +98,6 @@
   </Target>
   <PropertyGroup>
     <PostBuildEvent>echo Copying XInputInterface to the build directory if needed.
-xcopy "$(ProjectDir)Dependencies\XInput.Net\XInputInterface.dll" "$(OutDir)" /K /D /Y</PostBuildEvent>
+xcopy "$(ProjectDir)Dependencies\XInput.Net\XInputInterface.dll" /K /D /Y</PostBuildEvent>
   </PropertyGroup>
 </Project>

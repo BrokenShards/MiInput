@@ -20,6 +20,10 @@ See `SFInputTest/Example.cs` for example code and usage.
 
 ## Changelog
 
+### Version 0.5.2
+- Now `XInputInterface.dll` is coppied to the build directory on a successful build.
+- Updated SharpLogger to version 0.3.1.
+
 ### Version 0.5.1
 - Now the xml documentation is built with the binary and is included in releases.
 

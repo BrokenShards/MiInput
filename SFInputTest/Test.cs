@@ -70,11 +70,7 @@ namespace SFInputTest
 			if( a == null )
 				return Logger.LogReturn( "Unable to retrieve previously added action from the action set.", false, LogType.Error );
 
-			Logger.HideLogs = true;
-			bool result = Input.Manager.Actions.Add( a, false );
-			Logger.HideLogs = false;
-
-			if( result )
+			if( Input.Manager.Actions.Add( a, false ) )
 				return Logger.LogReturn( "Input manager allowed adding an action that already exists when replace is false.", false, LogType.Error );
 
 			if( !Input.Manager.SaveToFile( InputPath ) )

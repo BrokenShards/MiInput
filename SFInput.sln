@@ -1,12 +1,13 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 15
-VisualStudioVersion = 15.0.28307.1169
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.30621.155
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Dependencies", "Dependencies", "{D722A840-C480-4778-BD5B-4D695AC93422}"
 	ProjectSection(SolutionItems) = preProject
 		Dependencies\SharpID.dll = Dependencies\SharpID.dll
 		Dependencies\SharpLogger.dll = Dependencies\SharpLogger.dll
+		Dependencies\SharpSerial.dll = Dependencies\SharpSerial.dll
 		Dependencies\XInput.Net\XInputDotNetPure.dll = Dependencies\XInput.Net\XInputDotNetPure.dll
 		Dependencies\XInput.Net\XInputInterface.dll = Dependencies\XInput.Net\XInputInterface.dll
 	EndProjectSection

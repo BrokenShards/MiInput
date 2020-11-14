@@ -234,7 +234,7 @@ namespace SFInput
 			m_axis[ (uint)XAxis.RightStickY ]  = state.ThumbSticks.Right.Y;
 			m_axis[ (uint)XAxis.LeftTrigger ]  = state.Triggers.Left;
 			m_axis[ (uint)XAxis.RightTrigger ] = state.Triggers.Right;
-			m_axis[ (uint)XAxis.Triggers ]     = state.Triggers.Left - state.Triggers.Right;
+			m_axis[ (uint)XAxis.Triggers ]     = -state.Triggers.Left + state.Triggers.Right;
 
 			m_button[ (uint)XButton.A ]     = state.Buttons.A == ButtonState.Pressed;
 			m_button[ (uint)XButton.B ]     = state.Buttons.B == ButtonState.Pressed;
@@ -427,7 +427,6 @@ namespace SFInput
 			return new JoystickState( this );
 		}
 
-		private   uint    m_player;
 		/// <summary>
 		///   Array containing axis values.
 		/// </summary>
@@ -435,6 +434,8 @@ namespace SFInput
 		/// <summary>
 		///   Array containing buttin values.
 		/// </summary>
-		protected bool[]  m_button;
+		protected bool[] m_button;
+
+		private uint m_player;
 	}
 }

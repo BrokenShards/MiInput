@@ -22,14 +22,17 @@
 
 using System;
 using System.IO;
+using System.Text;
+using System.Xml;
 using SharpLogger;
+using SharpSerial;
 
 namespace SFInput
 {
 	/// <summary>
 	///   Singleton input manager class.
 	/// </summary>
-	public class Input
+	public class Input : XmlLoadable
 	{
 		/// <summary>
 		///   Maximum number of joysticks that can be connected at once.
@@ -95,10 +98,13 @@ namespace SFInput
 			Keyboard = new KeyboardManager();
 			Mouse    = new MouseManager();
 			Joystick = new JoystickManager[ MaxJoysticks ];
-			Actions  = new ActionSet();
+			Actions  = new ActionSet[ MaxJoysticks ];
 
 			for( uint i = 0; i < MaxJoysticks; i++ )
+			{
 				Joystick[ i ] = new JoystickManager( i );
+				Actions[ i ]  = new ActionSet();
+			}
 		}
 
 		/// <summary>
@@ -155,9 +161,9 @@ namespace SFInput
 		}
 		
 		/// <summary>
-		///   Currently mapped actions.
+		///   Currently mapped actions for each player.
 		/// </summary>
-		public ActionSet Actions
+		public ActionSet[] Actions
 		{
 			get; private set;
 		}
@@ -427,12 +433,21 @@ namespace SFInput
 		/// <param name="action">
 		///   The name of the mapped action.
 		/// </param>
+		/// <param name="player">
+		///   The player index.
+		/// </param>
 		/// <returns>
-		///   True if action is valid, mapped and pressed, otherwise false.
+		///   True if index and action are valid, mapped and pressed, otherwise false.
 		/// </returns>
-		public bool IsPressed( string action )
+		/// <exception cref="ArgumentOutOfRangeException">
+		///   If player greater than or equal to <see cref="MaxJoysticks"/>.
+		/// </exception>
+		public bool IsPressed( string action, uint player = 0 )
 		{
-			return Actions.Get( action )?.IsPressed ?? false;
+			if( player >= Actions.Length )
+				throw new ArgumentOutOfRangeException();
+
+			return Actions[ player ].Get( action )?.IsPressed ?? false;
 		}
 		/// <summary>
 		///   Checks if the input mapped to action was just pressed.
@@ -440,12 +455,21 @@ namespace SFInput
 		/// <param name="action">
 		///   The name of the mapped action.
 		/// </param>
+		/// <param name="player">
+		///   The player index.
+		/// </param>
 		/// <returns>
-		///   True if action is valid, mapped and was just pressed, otherwise false.
+		///   True if index and action are valid, mapped and was just pressed, otherwise false.
 		/// </returns>
-		public bool JustPressed( string action )
+		/// <exception cref="ArgumentOutOfRangeException">
+		///   If player greater than or equal to <see cref="MaxJoysticks"/>.
+		/// </exception>
+		public bool JustPressed( string action, uint player = 0 )
 		{
-			return Actions.Get( action )?.JustPressed ?? false;
+			if( player >= Actions.Length )
+				throw new ArgumentOutOfRangeException();
+
+			return Actions[ player ].Get( action )?.JustPressed ?? false;
 		}
 		/// <summary>
 		///   Checks if the input mapped to action was just released.
@@ -453,12 +477,43 @@ namespace SFInput
 		/// <param name="action">
 		///   The name of the mapped action.
 		/// </param>
+		/// <param name="player">
+		///   The player index.
+		/// </param>
 		/// <returns>
-		///   True if action is valid, mapped and was just released, otherwise false.
+		///   True if index and action are valid, mapped and was just released, otherwise false.
 		/// </returns>
-		public bool JustReleased( string action )
+		/// <exception cref="ArgumentOutOfRangeException">
+		///   If player greater than or equal to <see cref="MaxJoysticks"/>.
+		/// </exception>
+		public bool JustReleased( string action, uint player = 0 )
 		{
-			return Actions.Get( action )?.JustReleased ?? false;
+			if( player >= Actions.Length )
+				throw new ArgumentOutOfRangeException();
+
+			return Actions[ player ].Get( action )?.JustReleased ?? false;
+		}
+		/// <summary>
+		///   Gets the current value of the action.
+		/// </summary>
+		/// <param name="action">
+		///   The name of the mapped action.
+		/// </param>
+		/// <param name="player">
+		///   The player index.
+		/// </param>
+		/// <returns>
+		///   The current value of the mapped action if it is valid, otherwise zero.
+		/// </returns>
+		/// <exception cref="ArgumentOutOfRangeException">
+		///   If player greater than or equal to <see cref="MaxJoysticks"/>.
+		/// </exception>
+		public float GetValue( string action, uint player = 0 )
+		{
+			if( player >= Actions.Length )
+				throw new ArgumentOutOfRangeException();
+
+			return Actions[ player ].Get( action )?.Value ?? 0.0f;
 		}
 
 		/// <summary>
@@ -475,7 +530,41 @@ namespace SFInput
 				Joystick[ i ].Update();
 			}
 		}
-		
+
+		/// <summary>
+		///   Attempts to load the object from the xml element.
+		/// </summary>
+		/// <param name="element">
+		///   The xml element.
+		/// </param>
+		/// <returns>
+		///   True if the object was loaded successfully and false otherwise.
+		/// </returns>
+		public override bool LoadFromXml( XmlElement element )
+		{
+			if( element == null )
+				return Logger.LogReturn( "Unable to load input: root node is null.", false, LogType.Error );
+			if( element.Name.ToLower() != "input" )
+				return Logger.LogReturn( "Unable to load input: root node name must be \"input\".", false, LogType.Error );
+
+			uint player = 0;
+
+			foreach( var x in element.SelectNodes( "action_set" ) )
+			{
+				if( player >= MaxJoysticks )
+					break;
+
+				Actions[ player ] = new ActionSet();
+
+				if( !Actions[ player ].LoadFromXml( x as XmlElement ) )
+					return Logger.LogReturn( "Unable to load action set: action loaded successfully but could not be added.", false, LogType.Error );
+
+				player++;
+			}
+
+			return true;
+		}
+
 		/// <summary>
 		///   Loads the action set from an optional path.
 		/// </summary>
@@ -487,30 +576,56 @@ namespace SFInput
 		/// </returns>
 		public bool LoadFromFile( string path = null )
 		{
-			return Actions.LoadFromFile( path );
-		}
-		/// <summary>
-		///   Saves the current action set to an optional path
-		/// </summary>
-		/// <param name="path">
-		///   The path to save the action set to, or null to use the default path.
-		/// </param>
-		/// <returns></returns>
-		public bool SaveToFile( string path = null )
-		{
-			if( path == null )
+			if( string.IsNullOrWhiteSpace( path ) )
 				path = DefaultPath;
 
 			try
 			{
-				File.WriteAllText( path, Actions.ToString() );
+				XmlDocument doc = new XmlDocument();
+				doc.Load( path );
+
+				return LoadFromXml( doc.DocumentElement );
 			}
 			catch( Exception e )
 			{
-				return Logger.LogReturn( "Unable to write input settings to file: " + e.Message + ".", false, LogType.Error );
+				return Logger.LogReturn( "Unable to load input from file: " + e.Message + ".", false, LogType.Error );
 			}
+		}
+		/// <summary>
+		///   Saves the action set to an optional path, optionally overwriting any existing file.
+		/// </summary>
+		/// <param name="path">
+		///   File path.
+		/// </param>
+		/// <param name="overwrite">
+		///   If an already existing file should be overwritten.
+		/// </param>
+		/// <returns>
+		///   True if the action set was successfully written to file, otherwise false.
+		/// </returns>
+		public bool SaveToFile( string path = null, bool overwrite = true )
+		{
+			return ToFile( this, path, overwrite );
+		}
 
-			return true;
+		/// <summary>
+		///   Converts the object to an xml string.
+		/// </summary>
+		/// <returns>
+		///   Returns the object as an xml string.
+		/// </returns>
+		public override string ToString()
+		{
+			StringBuilder sb = new StringBuilder();
+
+			sb.AppendLine( "<input>" );
+
+			for( uint i = 0; i < MaxJoysticks; i++ )
+				sb.AppendLine( Actions[ i ].ToString( 1 ) );
+
+			sb.Append( "</input>" );
+
+			return sb.ToString();
 		}
 
 		private static volatile Input _instance;

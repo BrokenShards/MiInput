@@ -27,12 +27,12 @@ namespace SFInputTest
 				{
 					// Create action.
 					{
-						Action hor = new Action( "horizontal" );
-						hor.Add( new InputMap( InputDevice.Joystick, InputType.Axis, "LeftStickX" ) );
-						hor.Add( new InputMap( InputDevice.Keyboard, InputType.Button, "D", "A" ) );
+						Action hor = new Action( "horizontal", 
+						                         new InputMap( InputDevice.Joystick, InputType.Axis, "LeftStickX" ), 
+						                         new InputMap( InputDevice.Keyboard, InputType.Button, "D", "A" ) );
 
 						// Add action to action set, replacing an already existing action with the same ID.
-						if( !Input.Manager.Actions.Add( hor, true ) )
+						if( !Input.Manager.Actions[ 0 ].Add( hor, true ) )
 						{
 							Console.WriteLine( "Failed adding action to set (is the action valid?)" );
 							exitVal = -1;
@@ -42,7 +42,7 @@ namespace SFInputTest
 
 					// Retrieve assigned action.
 					{
-						Action a = Input.Manager.Actions[ "horizontal" ];
+						Action a = Input.Manager.Actions[ 0 ][ "horizontal" ];
 
 						if( a == null )
 						{
@@ -53,32 +53,24 @@ namespace SFInputTest
 					}
 
 					// Save action set to file.
+					if( !Input.Manager.SaveToFile( FilePath, true ) )
 					{
-						try
-						{
-							File.WriteAllText( FilePath, Input.Manager.Actions.ToString() );
-						}
-						catch
-						{
-							Console.WriteLine( "Unable to write action set to file." );
-							exitVal = -3;
-							running = false;
-						}
+						Console.WriteLine( "Unable to write action set to file." );
+						exitVal = -3;
+						running = false;
 					}
 
 					// Load action set from file.
+					if( !Input.Manager.LoadFromFile( FilePath ) )
 					{
-						if( !Input.Manager.Actions.LoadFromFile( FilePath ) )
-						{
-							Console.WriteLine( "Unable to load action set from file." );
-							exitVal = -4;
-							running = false;
-						}
+						Console.WriteLine( "Unable to load action set from file." );
+						exitVal = -4;
+						running = false;
 					}
 
 					// Access assigned action.
 					{
-						Action horizontal = Input.Manager.Actions[ "horizontal" ];
+						Action horizontal = Input.Manager.Actions[ 0 ][ "horizontal" ];
 
 						if( horizontal == null )
 						{
@@ -104,7 +96,7 @@ namespace SFInputTest
 					Input.Manager.Update();
 
 					lastX = thisX;
-					thisX = Input.Manager.Actions[ "horizontal" ].Value;
+					thisX = Input.Manager.Actions[ 0 ][ "horizontal" ].Value;
 
 					// Only print horizontal action value if it changed.
 					if( thisX != lastX )

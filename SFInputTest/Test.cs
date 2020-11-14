@@ -51,36 +51,39 @@ namespace SFInputTest
 			if( !WindowTest() )
 				return Logger.LogReturn( "Window test failed.", -1, LogType.Error );
 
+			Logger.Log( "Testing successful!" );
+			Logger.Log( "Running example." );
+
 			if( Example.RunExample() != 0 )
 				return Logger.LogReturn( "Run example failed.", -1, LogType.Error );
 
-			Logger.Log( "Testing successful." );
+			Logger.Log( "Press enter to exit." );
 			return 0;
 		}
 
 		private static bool ActionTest()
 		{
-			Action act = new Action( "test" );
-			act.Add( new InputMap( InputDevice.Joystick, InputType.Button, "0", "1" ) );
+			Action act = new Action( "test", new InputMap( InputDevice.Joystick, InputType.Button, "0", "1" ) );
 
-			if( !Input.Manager.Actions.Add( act ) )
+			if( !Input.Manager.Actions[ 0 ].Add( act ) )
 				return Logger.LogReturn( "Unable to add valid action to action set.", false, LogType.Error );
 
-			Action a = Input.Manager.Actions[ "test" ];
+			Action a = Input.Manager.Actions[ 0 ][ "test" ];
 			if( a == null )
 				return Logger.LogReturn( "Unable to retrieve previously added action from the action set.", false, LogType.Error );
 
-			if( Input.Manager.Actions.Add( a, false ) )
+			if( Input.Manager.Actions[ 0 ].Add( a, false ) )
 				return Logger.LogReturn( "Input manager allowed adding an action that already exists when replace is false.", false, LogType.Error );
 
-			if( !Input.Manager.SaveToFile( InputPath ) )
+			if( !Input.Manager.SaveToFile( InputPath, true ) )
 				return Logger.LogReturn( "Input manager failed saving to file.", false, LogType.Error );
+			
 			if( !Input.Manager.LoadFromFile( InputPath ) )
 				return Logger.LogReturn( "Input manager failed loading from file.", false, LogType.Error );
 
-			if( !Input.Manager.Actions.Contains( a ) )
+			if( !Input.Manager.Actions[ 0 ].Contains( a ) )
 				return Logger.LogReturn( "Lost mapped input after loading from file.", false, LogType.Error );
-			if( Input.Manager.Actions[ "test" ].Name != act.Name )
+			if( Input.Manager.Actions[ 0 ][ "test" ].Name != act.Name )
 				return Logger.LogReturn( "Input manager did not load from file correctly.", false, LogType.Error );
 
 			try
@@ -96,10 +99,9 @@ namespace SFInputTest
 		{
 			Input.Manager.Update();
 
-			Action test = new Action( "test" );
-			test.Add( new InputMap( InputDevice.Joystick, InputType.Button, "A", "B" ) );
+			Action test = new Action( "test", new InputMap( InputDevice.Joystick, InputType.Button, "A", "B" ) );
 
-			if( !Input.Manager.Actions.Add( test, true ) )
+			if( !Input.Manager.Actions[ 0 ].Add( test, true ) )
 				return Logger.LogReturn( "Unable to add test action to input manager.", false, LogType.Error );
 
 			uint press = 0;
@@ -116,13 +118,13 @@ namespace SFInputTest
 
 					Input.Manager.Update();
 
-					if( press == 0 && Input.Manager.Actions[ "test" ].IsPressed )
+					if( press == 0 && Input.Manager.Actions[ 0 ][ "test" ].IsPressed )
 					{
 						Logger.Log( "Press B button." );
 						press++;
 					}
 
-					if( press == 1 && Input.Manager.Actions[ "test" ].IsNegative )
+					if( press == 1 && Input.Manager.Actions[ 0 ][ "test" ].IsNegative )
 						press++;
 
 					if( press > 1 )
@@ -134,7 +136,7 @@ namespace SFInputTest
 				}
 			}
 
-			Input.Manager.Actions.Remove( "test" );
+			Input.Manager.Actions[ 0 ].Remove( "test" );
 			return true;
 		}
 

@@ -9,16 +9,20 @@ to suggestions and will attempt to fix any issues.
 - SFML.Net `https://github.com/graphnode/SFML.Net.git`
 - SharpID `https://github.com/BrokenShards/SharpID.git`
 - SharpLogger `https://github.com/BrokenShards/SharpLogger.git`
+- SharpSerial `https://github.com/BrokenShards/SharpSerial.git`
 - XInputDotNetPure `https://github.com/speps/XInputDotNet.git`
 
 ## Usage
 See `SFInputTest/Example.cs` for example code and usage.
 
 ## TO-DO
-### Possibilities
-- Design a simple GUI application for creating/modifying action sets.
 
 ## Changelog
+
+### Version 0.6.0
+- Now SharpSerial is used as an interface to load and save `InputMap`, `Action`, `ActionSet` and `Input` to and from file.
+- `Input.Actions` is now an array containing an action set for each player rather than just a single action set.
+- Corrected joystick trigger axis logic.
 
 ### Version 0.5.2
 - Now `XInputInterface.dll` is coppied to the build directory on a successful build.

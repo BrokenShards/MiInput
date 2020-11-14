@@ -23,6 +23,8 @@
 using System;
 using System.Text;
 using System.Xml;
+
+using SharpSerial;
 using SharpLogger;
 
 namespace SFInput
@@ -78,7 +80,7 @@ namespace SFInput
 	///   Used to map inputs.
 	/// </summary>
 	[Serializable]
-	public class InputMap
+	public class InputMap : XmlLoadable
 	{
 		/// <summary>
 		///   Checks if two input maps collide with eachother.
@@ -235,22 +237,22 @@ namespace SFInput
 		public bool Invert { get; set; }
 
 		/// <summary>
-		///   Loads data from an xml node.
+		///   Loads data from an xml element.
 		/// </summary>
-		/// <param name="node">
-		///   The node to load data from.
+		/// <param name="ele">
+		///   The element to load data from.
 		/// </param>
 		/// <returns>
 		///   True if loaded successfully and false otherwise.
 		/// </returns>
-		public bool LoadFromXml( XmlNode node )
+		public override bool LoadFromXml( XmlElement ele )
 		{
-			if( node == null )
+			if( ele == null )
 				return Logger.LogReturn( "Unable to load input map from a null xml element.", false, LogType.Error );
 
 			// Type
 			{
-				string loname = node.Name.ToLower();
+				string loname = ele.Name.ToLower();
 
 				Type = loname == "button" ? InputType.Button : ( loname == "axis" ? InputType.Axis : (InputType)( -1 ) );
 
@@ -260,7 +262,7 @@ namespace SFInput
 
 			// Device
 			{
-				string device = node.Attributes[ "device" ]?.Value;
+				string device = ele.Attributes[ "device" ]?.Value;
 
 				if( device == null )
 					return Logger.LogReturn( "Trying to load input map with no device attribute.", false, LogType.Error );
@@ -272,8 +274,8 @@ namespace SFInput
 
 			// Value
 			{
-				string val = node.Attributes[ "value" ]?.Value ?? node.Attributes[ "positive" ]?.Value,
-				       neg = node.Attributes[ "negative" ]?.Value;
+				string val = ele.Attributes[ "value" ]?.Value ?? ele.Attributes[ "positive" ]?.Value,
+				       neg = ele.Attributes[ "negative" ]?.Value;
 
 				if( string.IsNullOrWhiteSpace( val ) )
 					val = null;
@@ -327,7 +329,7 @@ namespace SFInput
 
 			// Invert
 			{
-				string invert = node.Attributes[ "invert" ]?.Value;
+				string invert = ele.Attributes[ "invert" ]?.Value;
 
 				if( invert == null )
 					return Logger.LogReturn( "Trying to load input map with no invert attribute.", false, LogType.Error );
@@ -349,57 +351,35 @@ namespace SFInput
 		/// </returns>
 		public override string ToString()
 		{
-			return ToString( 0 );
-		}
-		/// <summary>
-		///   Gets the xml file representation of the object as a string.
-		/// </summary>
-		/// <param name="tab">
-		///   The amount of tabs that should be used for indentation.
-		/// </param>
-		/// <returns>
-		///   The xml object data as a string.
-		/// </returns>
-		public string ToString( uint tab )
-		{
 			StringBuilder sb = new StringBuilder();
 
 			string spacer = Type == InputType.Button ? "        " : "      ";
-			string tabs   = string.Empty;
 
-			for( uint i = 0; i < tab; i++ )
-				tabs += '\t';
-
-			sb.Append( tabs );
 			sb.Append( Type == InputType.Button ? "<button " : "<axis " );
 			sb.Append( "device=\"" );
 			sb.Append( Device.ToString() );
-			sb.Append( "\"\n" );
+			sb.AppendLine( "\"" );
 
 			if( Type == InputType.Axis )
 			{
-				sb.Append( tabs );
 				sb.Append( spacer );
 				sb.Append( "value=\"" );
 				sb.Append( string.IsNullOrWhiteSpace( Value ) ? string.Empty : Value );
-				sb.Append( "\"\n" );
+				sb.AppendLine( "\"" );
 			}
 			else if( Type == InputType.Button )
 			{
-				sb.Append( tabs );
 				sb.Append( spacer );
 				sb.Append( "positive=\"" );
 				sb.Append( string.IsNullOrWhiteSpace( Value ) ? string.Empty : Value );
-				sb.Append( "\"\n" );
+				sb.AppendLine( "\"" );
 
-				sb.Append( tabs );
 				sb.Append( spacer );
 				sb.Append( "negative=\"" );
 				sb.Append( string.IsNullOrWhiteSpace( Negative ) ? string.Empty : Negative );
-				sb.Append( "\"\n" );
+				sb.AppendLine( "\"" );
 			}
 
-			sb.Append( tabs );
 			sb.Append( spacer );
 			sb.Append( "invert=\"" );
 			sb.Append( Invert );

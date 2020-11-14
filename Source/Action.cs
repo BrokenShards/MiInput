@@ -26,6 +26,7 @@ using System.Text;
 using System.Xml;
 
 using SharpID;
+using SharpSerial;
 using SharpLogger;
 
 namespace SFInput
@@ -33,7 +34,7 @@ namespace SFInput
 	/// <summary>
 	///   A collection of inputs mapped to a name.
 	/// </summary>
-	public class Action : INamable, IEnumerable<InputMap>
+	public class Action : XmlLoadable, INamable, IEnumerable<InputMap>
 	{
 		/// <summary>
 		///   Constructor.
@@ -77,7 +78,7 @@ namespace SFInput
 		/// <param name="map">
 		///   The input map.
 		/// </param>
-		public Action( string name, InputMap map )
+		public Action( string name, params InputMap[] map )
 		{
 			Name = string.IsNullOrWhiteSpace( name ) ? string.Empty : name;
 			m_inputs = new List<InputMap>();
@@ -436,25 +437,25 @@ namespace SFInput
 		/// <summary>
 		///   Loads data from an xml element.
 		/// </summary>
-		/// <param name="node">
-		///   The node to load data from.
+		/// <param name="ele">
+		///   The element to load data from.
 		/// </param>
 		/// <returns>
 		///   True if loaded successfully and false otherwise.
 		/// </returns>
-		public bool LoadFromXml( XmlNode node )
+		public override bool LoadFromXml( XmlElement ele )
 		{
-			if( node == null )
+			if( ele == null )
 				return Logger.LogReturn( "Unable to load action from a null xml element.", false, LogType.Error );
 
-			string name = node.Attributes[ "name" ]?.Value?.Trim();
+			string name = ele.Attributes[ "name" ]?.Value?.Trim();
 
 			if( !Naming.IsValid( name ) )
 				return Logger.LogReturn( "Unable to load action; name either does not exist or is invalid.", false, LogType.Error );
 
 			Name = name;
 			
-			foreach( XmlNode n in node.ChildNodes )
+			foreach( XmlElement n in ele.ChildNodes )
 			{
 				string loname = n.Name.ToLower();
 
@@ -480,36 +481,19 @@ namespace SFInput
 		/// </returns>
 		public override string ToString()
 		{
-			return ToString( 0 );
-		}
-		/// <summary>
-		///   Returns the action as an xml string with a given amount of indentation.
-		/// </summary>
-		/// <param name="tab">
-		///   The amount of tabs to use for indentation.
-		/// </param>
-		/// <returns>
-		///   The action as an xml string.
-		/// </returns>
-		public string ToString( uint tab )
-		{
 			StringBuilder sb = new StringBuilder();
 
-			string tabs = string.Empty;
-			for( uint i = 0; i < tab; i++ )
-				tabs += '\t';
-
-			sb.Append( tabs ); sb.Append( "<action name=\"" ); sb.Append( Name ); sb.Append( "\">\n" );
+			sb.Append( "<action name=\"" ); sb.Append( Name ); sb.AppendLine( "\">" );
 
 			foreach( InputMap p in m_inputs )
 			{
 				if( p == null )
 					continue;
 
-				sb.Append( p.ToString( tab + 1 ) ); sb.Append( "\n" );
+				sb.AppendLine( p.ToString( 1 ) );
 			}
 
-			sb.Append( tabs ); sb.Append( "</action>" );
+			sb.Append( "</action>" );
 			return sb.ToString();
 		}
 

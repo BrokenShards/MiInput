@@ -56,6 +56,9 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>Dependencies\SharpLogger.dll</HintPath>
     </Reference>
+    <Reference Include="SharpSerial">
+      <HintPath>Dependencies\SharpSerial.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Xml.Linq" />

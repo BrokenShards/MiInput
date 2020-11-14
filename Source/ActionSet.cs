@@ -25,6 +25,8 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Text;
 using System.Xml;
+
+using SharpSerial;
 using SharpLogger;
 
 namespace SFInput
@@ -32,7 +34,7 @@ namespace SFInput
 	/// <summary>
 	///   A collection of actions.
 	/// </summary>
-	public class ActionSet : IEnumerable<KeyValuePair<string, Action>>
+	public class ActionSet : XmlLoadable, IEnumerable<KeyValuePair<string, Action>>
 	{
 		/// <summary>
 		///   Constructor.
@@ -226,24 +228,40 @@ namespace SFInput
 				XmlDocument doc = new XmlDocument();
 				doc.Load( path );
 
-				XmlElement root = doc.DocumentElement;
-
-				if( root.Name.ToLower() != "action_set" )
-					return Logger.LogReturn( "Unable to load action set: root node name must be \"action_set\".", false, LogType.Error );
-
-				foreach( var x in root.SelectNodes( "action" ) )
-				{
-					Action a = new Action();
-
-					if( !a.LoadFromXml( x as XmlNode ) )
-						return false;
-					if( !Add( a, true ) )
-						return Logger.LogReturn( "Unable to load action set: action loaded successfully but could not be added.", false, LogType.Error );
-				}
+				return LoadFromXml( doc.DocumentElement );
 			}
 			catch( Exception e )
 			{
 				return Logger.LogReturn( "Unable to load action set: " + e.Message + ".", false, LogType.Error );
+			}
+		}
+
+		/// <summary>
+		///   Attempts to load the object from the xml element.
+		/// </summary>
+		/// <param name="element">
+		///   The xml element.
+		/// </param>
+		/// <returns>
+		///   True if object data was loaded successfully and false otherwise.
+		/// </returns>
+		public override bool LoadFromXml( XmlElement element )
+		{
+			if( element == null )
+				return Logger.LogReturn( "Unable to load action set: root node is null.", false, LogType.Error );
+			if( element.Name.ToLower() != "action_set" )
+				return Logger.LogReturn( "Unable to load action set: root node name must be \"action_set\".", false, LogType.Error );
+
+			Clear();
+
+			foreach( var x in element.SelectNodes( "action" ) )
+			{
+				Action a = new Action();
+
+				if( !a.LoadFromXml( x as XmlElement ) )
+					return false;
+				if( !Add( a, true ) )
+					return Logger.LogReturn( "Unable to load action set: action loaded successfully but could not be added.", false, LogType.Error );
 			}
 
 			return true;
@@ -257,15 +275,17 @@ namespace SFInput
 		/// </returns>
 		public override string ToString()
 		{
+			if( Empty )
+				return "<action_set/>";
+
 			StringBuilder sb = new StringBuilder();
 
-			sb.AppendLine( "<?xml version=\"1.0\" encoding=\"utf-8\"?>" );
 			sb.AppendLine( "<action_set>" );
 
 			foreach( var ac in m_actions )
 				sb.AppendLine( ac.Value.ToString( 1 ) );
 
-			sb.AppendLine( "</action_set>" );
+			sb.Append( "</action_set>" );
 			return sb.ToString();
 		}
 

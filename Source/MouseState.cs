@@ -49,7 +49,7 @@ namespace SFInput
 	/// <summary>
 	///   Represents the state of the mouse at a given moment.
 	/// </summary>
-	public class MouseState : ICloneable
+	public class MouseState : ICloneable, IEquatable<MouseState>
 	{
 		/// <summary>
 		///   Button count.
@@ -339,6 +339,27 @@ namespace SFInput
 		public object Clone()
 		{
 			return new MouseState( this );
+		}
+
+		/// <summary>
+		///   Checks if this object is equal to another.
+		/// </summary>
+		/// <param name="other">
+		///   The object to check against.
+		/// </param>
+		/// <returns>
+		///   True if this object is considered equal to the given object.
+		/// </returns>
+		public bool Equals( MouseState other )
+		{
+			for( uint i = 0; i < ButtonCount; i++ )
+				if( m_button[ i ] != other.m_button[ i ] )
+					return false;
+			for( uint i = 0; i < AxisCount; i++ )
+				if( m_axis[ i ] != other.m_axis[ i ] )
+					return false;
+
+			return true;
 		}
 
 		private bool[] m_button;

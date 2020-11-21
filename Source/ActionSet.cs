@@ -53,6 +53,17 @@ namespace SFInput
 		{
 			m_actions = a.Empty ? new Dictionary<string, Action>() : new Dictionary<string, Action>( a.Count );
 		}
+		/// <summary>
+		///   Constructs the set, populating it with one or multiple actions.
+		/// </summary>
+		/// <param name="acts">
+		///   The actions to construct the set with.
+		/// </param>
+		public ActionSet( params Action[] acts )
+		:	this()
+		{
+			Add( acts );
+		}
 
 		/// <summary>
 		///   Accesses the action with the given name if it exists within the set.
@@ -167,6 +178,28 @@ namespace SFInput
 
 			m_actions.Add( a.Name, a );
 			return true;
+		}
+		/// <summary>
+		///   Adds multipe actions to the set.
+		/// </summary>
+		/// <param name="acts">
+		///   One or multiple actions to add.
+		/// </param>
+		/// <returns>
+		///   The amount of actions that were successfully added to the set.
+		/// </returns>
+		public uint Add( params Action[] acts )
+		{
+			if( acts == null || acts.Length == 0 )
+				return 0;
+
+			uint count = 0;
+
+			foreach( Action a in acts )
+				if( Add( a ) )
+					count++;
+
+			return count;
 		}
 
 		/// <summary>

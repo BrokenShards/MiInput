@@ -233,6 +233,49 @@ namespace SFInput
 			return !m_current.IsPressed( key ) && m_last.IsPressed( key );
 		}
 
+		/// <summary>
+		///   Checks if any key is currently pressed.
+		/// </summary>
+		/// <returns>
+		///   True if any keys are currently pressed and false otherwise.
+		/// </returns>
+		public bool AnyPressed()
+		{
+			for( Keyboard.Key k = 0; k < Keyboard.Key.KeyCount; k++ )
+				if( IsPressed( k ) )
+					return true;
+
+			return false;
+		}
+		/// <summary>
+		///   Checks if any key has just been pressed.
+		/// </summary>
+		/// <returns>
+		///   True if any keys have just been pressed and false otherwise.
+		/// </returns>
+		public bool AnyJustPressed()
+		{
+			for( Keyboard.Key k = 0; k < Keyboard.Key.KeyCount; k++ )
+				if( JustPressed( k ) )
+					return true;
+
+			return false;
+		}
+		/// <summary>
+		///   Checks if any key has just been pressed.
+		/// </summary>
+		/// <returns>
+		///   True if any keys have just been pressed and false otherwise.
+		/// </returns>
+		public bool AnyJustReleased()
+		{
+			for( Keyboard.Key k = 0; k < Keyboard.Key.KeyCount; k++ )
+				if( JustReleased( k ) )
+					return true;
+
+			return false;
+		}
+
 		private KeyboardState m_current,
 		                      m_last;
 	}

@@ -147,7 +147,7 @@ namespace SFInput
 	/// <summary>
 	///   Represents the state of a single joystick at a given moment.
 	/// </summary>
-	public class JoystickState : ICloneable
+	public class JoystickState : ICloneable, IEquatable<JoystickState>
 	{
 		/// <summary>
 		///   Button count.
@@ -425,6 +425,27 @@ namespace SFInput
 		public object Clone()
 		{
 			return new JoystickState( this );
+		}
+
+		/// <summary>
+		///   Checks if this object is equal to another.
+		/// </summary>
+		/// <param name="other">
+		///   The object to check against.
+		/// </param>
+		/// <returns>
+		///   True if this object is considered equal to the given object.
+		/// </returns>
+		public bool Equals( JoystickState other )
+		{
+			for( uint i = 0; i < ButtonCount; i++ )
+				if( m_button[ i ] != other.m_button[ i ] )
+					return false;
+			for( uint i = 0; i < AxisCount; i++ )
+				if( m_axis[ i ] != other.m_axis[ i ] )
+					return false;
+
+			return true;
 		}
 
 		/// <summary>

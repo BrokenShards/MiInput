@@ -28,7 +28,7 @@ namespace SFInput
 	/// <summary>
 	///   Represents the state of the keyboard at a given moment.
 	/// </summary>
-	public class KeyboardState : ICloneable
+	public class KeyboardState : ICloneable, IEquatable<KeyboardState>
 	{
 		/// <summary>
 		///   Key count.
@@ -137,6 +137,24 @@ namespace SFInput
 		public object Clone()
 		{
 			return new KeyboardState( this );
+		}
+
+		/// <summary>
+		///   Checks if this object is equal to another.
+		/// </summary>
+		/// <param name="other">
+		///   The object to check against.
+		/// </param>
+		/// <returns>
+		///   True if this object is considered equal to the given object.
+		/// </returns>
+		public bool Equals( KeyboardState other )
+		{
+			for( uint i = 0; i < KeyCount; i++ )
+				if( m_keys[ i ] != other.m_keys[ i ] )
+					return false;
+
+			return true;
 		}
 
 		private bool[] m_keys;

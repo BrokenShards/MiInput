@@ -398,6 +398,64 @@ namespace SFInput
 		}
 
 		/// <summary>
+		///   Checks if any button is currently pressed.
+		/// </summary>
+		/// <returns>
+		///   True if any buttons are currently pressed and false otherwise.
+		/// </returns>
+		public bool AnyPressed()
+		{
+			for( Mouse.Button b = 0; b < Mouse.Button.ButtonCount; b++ )
+				if( IsPressed( b ) )
+					return true;
+
+			return false;
+		}
+		/// <summary>
+		///   Checks if any button has just been pressed.
+		/// </summary>
+		/// <returns>
+		///   True if any buttons have just been pressed and false otherwise.
+		/// </returns>
+		public bool AnyJustPressed()
+		{
+			for( Mouse.Button b = 0; b < Mouse.Button.ButtonCount; b++ )
+				if( JustPressed( b ) )
+					return true;
+
+			return false;
+		}
+		/// <summary>
+		///   Checks if any button has just been pressed.
+		/// </summary>
+		/// <returns>
+		///   True if any buttons have just been pressed and false otherwise.
+		/// </returns>
+		public bool AnyJustReleased()
+		{
+			for( Mouse.Button b = 0; b < Mouse.Button.ButtonCount; b++ )
+				if( JustReleased( b ) )
+					return true;
+
+			return false;
+		}
+
+		/// <summary>
+		///   Checks if any axis has just been moved.
+		/// </summary>
+		/// <returns>
+		///   True if any axies have just been moved and false otherwise.
+		/// </returns>
+		public bool AnyJustMoved()
+		{
+			for( MouseAxis b = 0; b < MouseAxis.COUNT; b++ )
+				if( m_current.GetAxis( b ) != m_last.GetAxis( b ) )
+					return true;
+
+			return false;
+		}
+
+		/// <summary>
 		///   Gets the current state of the axis.
 		/// </summary>
 		/// <param name="ax">

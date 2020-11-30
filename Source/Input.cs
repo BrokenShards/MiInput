@@ -605,6 +605,9 @@ namespace SFInput
 		/// </returns>
 		public bool SaveToFile( string path = null, bool overwrite = true )
 		{
+			if( string.IsNullOrWhiteSpace( path ) )
+				path = DefaultPath;
+
 			return ToFile( this, path, overwrite );
 		}
 

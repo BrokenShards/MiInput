@@ -19,6 +19,11 @@ See `SFInputTest/Example.cs` for example code and usage.
 
 ## Changelog
 
+### Version 0.6.2
+- Fixed issue where `Input.SaveToFile(string,bool)` was not using `Input.DefaultPath` when the
+  given path is null.
+- Updated SharpSerial to version 0.5.0.
+
 ### Version 0.6.1
 - Added constructor and function to `ActionSet` for adding multiple `Action`s at once.
 - Added functions to `KeyboardManager`, `MouseManager` and `JoystickManager` to easily detect if

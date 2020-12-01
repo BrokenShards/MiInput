@@ -248,34 +248,36 @@ namespace SFInput
 		public override bool LoadFromXml( XmlElement ele )
 		{
 			if( ele == null )
-				return Logger.LogReturn( "Unable to load input map from a null xml element.", false, LogType.Error );
+				return Logger.LogReturn( "Failed loading InputMap: Null xml element.", false, LogType.Error );
 
 			// Type
 			{
 				string loname = ele.Name.ToLower();
-
 				Type = loname == "button" ? InputType.Button : ( loname == "axis" ? InputType.Axis : (InputType)( -1 ) );
 
 				if( Type < 0 )
-					return Logger.LogReturn( "Trying to load input map with invalid input type.", false, LogType.Error );
+					return Logger.LogReturn( "Failed loading InputMap: Invalid input type.", false, LogType.Error );
 			}
 
 			// Device
 			{
-				string device = ele.Attributes[ "device" ]?.Value;
+				string device = ele.GetAttribute( "device" );
 
-				if( device == null )
-					return Logger.LogReturn( "Trying to load input map with no device attribute.", false, LogType.Error );
+				if( string.IsNullOrWhiteSpace( device ) )
+					return Logger.LogReturn( "Failed loading InputMap: No device attribute.", false, LogType.Error );
 				else if( !Enum.TryParse( device, true, out InputDevice dev ) )
-					return Logger.LogReturn( "Trying to load input map with an invalid device attribute.", false, LogType.Error );
+					return Logger.LogReturn( "Failed loading InputMap: Invalid device attribute.", false, LogType.Error );
 				else
 					Device = dev;
 			}
 
 			// Value
 			{
-				string val = ele.Attributes[ "value" ]?.Value ?? ele.Attributes[ "positive" ]?.Value,
-				       neg = ele.Attributes[ "negative" ]?.Value;
+				string val = ele.GetAttribute( "value" ),
+				       neg = ele.GetAttribute( "negative" );
+
+				if( string.IsNullOrWhiteSpace( val ) )
+					val = ele.GetAttribute( "positive" );
 
 				if( string.IsNullOrWhiteSpace( val ) )
 					val = null;
@@ -283,28 +285,28 @@ namespace SFInput
 					neg = null;
 
 				if( val == null && neg == null )
-					return Logger.LogReturn( "Trying to load input map with no positive and negative or value attributes.", false, LogType.Error );
+					return Logger.LogReturn( "Failed loading InputMap: No positive and negative or value attributes.", false, LogType.Error );
 
 				if( Device == InputDevice.Keyboard )
 				{
 					if( val != null && !KeyboardManager.IsKey( val ) )
-						return Logger.LogReturn( "Trying to load input map with invalid positive or value attribute.", false, LogType.Error );
+						return Logger.LogReturn( "Failed loading InputMap: Invalid positive or value attribute.", false, LogType.Error );
 					if( neg != null && !KeyboardManager.IsKey( neg ) )
-						return Logger.LogReturn( "Trying to load input map with invalid negative attribute.", false, LogType.Error );
+						return Logger.LogReturn( "Failed loading InputMap: Invalid negative attribute.", false, LogType.Error );
 				}
 				else if( Device == InputDevice.Mouse )
 				{
 					if( Type == InputType.Axis )
 					{
 						if( !MouseManager.IsAxis( val ) )
-							return Logger.LogReturn( "Unable to load input map; failed parsing mouse axis.", false, LogType.Error );
+							return Logger.LogReturn( "Failed loading InputMap: Unable to parse mouse axis.", false, LogType.Error );
 					}
 					else if( Type == InputType.Button )
 					{
 						if( val != null && !MouseManager.IsButton( val ) )
-							return Logger.LogReturn( "Trying to load input map with invalid positive or value attribute.", false, LogType.Error );
+							return Logger.LogReturn( "Failed loading InputMap: Invalid positive or value attribute.", false, LogType.Error );
 						if( neg != null && !MouseManager.IsButton( neg ) )
-							return Logger.LogReturn( "Trying to load input map with invalid negative attribute.", false, LogType.Error );
+							return Logger.LogReturn( "Failed loading InputMap: Invalid negative attribute.", false, LogType.Error );
 					}
 				}
 				else if( Device == InputDevice.Joystick )
@@ -312,14 +314,14 @@ namespace SFInput
 					if( Type == InputType.Axis )
 					{
 						if( !JoystickManager.IsAxis( val ) )
-							return Logger.LogReturn( "Unable to load input map; failed parsing joystick axis.", false, LogType.Error );
+							return Logger.LogReturn( "Failed loading InputMap: Unable to parse joystick axis.", false, LogType.Error );
 					}
 					else if( Type == InputType.Button )
 					{
 						if( val != null && !JoystickManager.IsButton( val ) )
-							return Logger.LogReturn( "Trying to load input map with invalid positive or value attribute.", false, LogType.Error );
+							return Logger.LogReturn( "Failed loading InputMap: Invalid positive or value attribute.", false, LogType.Error );
 						if( neg != null && !JoystickManager.IsButton( neg ) )
-							return Logger.LogReturn( "Trying to load input map with invalid negative attribute.", false, LogType.Error );
+							return Logger.LogReturn( "Failed loading InputMap: Invalid negative attribute.", false, LogType.Error );
 					}
 				}
 
@@ -329,13 +331,13 @@ namespace SFInput
 
 			// Invert
 			{
-				string invert = ele.Attributes[ "invert" ]?.Value;
+				string invert = ele.GetAttribute( "invert" );
 
-				if( invert == null )
-					return Logger.LogReturn( "Trying to load input map with no invert attribute.", false, LogType.Error );
+				if( string.IsNullOrWhiteSpace( invert ) )
+					return Logger.LogReturn( "Failed loading InputMap: No invert attribute.", false, LogType.Error );
 
 				if( !bool.TryParse( invert, out bool i ) )
-					return Logger.LogReturn( "Trying to load input map with an invalid invert attribute.", false, LogType.Error );
+					return Logger.LogReturn( "Failed loading InputMap: Invalid invert attribute.", false, LogType.Error );
 
 				Invert = i;
 			}

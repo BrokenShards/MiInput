@@ -265,7 +265,7 @@ namespace SFInput
 			}
 			catch( Exception e )
 			{
-				return Logger.LogReturn( "Unable to load action set: " + e.Message + ".", false, LogType.Error );
+				return Logger.LogReturn( "Unable to load action set: " + e.Message, false, LogType.Error );
 			}
 		}
 
@@ -281,9 +281,7 @@ namespace SFInput
 		public override bool LoadFromXml( XmlElement element )
 		{
 			if( element == null )
-				return Logger.LogReturn( "Unable to load action set: root node is null.", false, LogType.Error );
-			if( element.Name.ToLower() != "action_set" )
-				return Logger.LogReturn( "Unable to load action set: root node name must be \"action_set\".", false, LogType.Error );
+				return Logger.LogReturn( "Failed loading ActionSet: Null xml element.", false, LogType.Error );
 
 			Clear();
 
@@ -292,9 +290,9 @@ namespace SFInput
 				Action a = new Action();
 
 				if( !a.LoadFromXml( x as XmlElement ) )
-					return false;
+					return Logger.LogReturn( "Failed loading ActionSet: Unable to load Action.", false, LogType.Error );
 				if( !Add( a, true ) )
-					return Logger.LogReturn( "Unable to load action set: action loaded successfully but could not be added.", false, LogType.Error );
+					return Logger.LogReturn( "Failed loading ActionSet: Unable to add Action.", false, LogType.Error );
 			}
 
 			return true;

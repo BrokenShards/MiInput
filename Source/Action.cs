@@ -446,12 +446,14 @@ namespace SFInput
 		public override bool LoadFromXml( XmlElement ele )
 		{
 			if( ele == null )
-				return Logger.LogReturn( "Unable to load action from a null xml element.", false, LogType.Error );
+				return Logger.LogReturn( "Failed loading Action: Null xml element.", false, LogType.Error );
 
-			string name = ele.Attributes[ "name" ]?.Value?.Trim();
+			string name = ele.GetAttribute( "name" );
 
+			if( string.IsNullOrWhiteSpace( name ) )
+				return Logger.LogReturn( "Failed loading Action: No name attribute.", false, LogType.Error );
 			if( !Naming.IsValid( name ) )
-				return Logger.LogReturn( "Unable to load action; name either does not exist or is invalid.", false, LogType.Error );
+				return Logger.LogReturn( "Failed loading Action: Invalid name attribute.", false, LogType.Error );
 
 			Name = name;
 			
@@ -464,7 +466,7 @@ namespace SFInput
 					InputMap map = new InputMap();
 
 					if( !map.LoadFromXml( n ) )
-						return false;
+						return Logger.LogReturn( "Failed loading Action: Unable to load InputMap.", false, LogType.Error );
 
 					m_inputs.Add( map );
 				}

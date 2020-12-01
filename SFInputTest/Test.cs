@@ -72,8 +72,21 @@ namespace SFInputTest
 			if( a == null )
 				return Logger.LogReturn( "Unable to retrieve previously added action from the action set.", false, LogType.Error );
 
-			if( Input.Manager.Actions[ 0 ].Add( a, false ) )
-				return Logger.LogReturn( "Input manager allowed adding an action that already exists when replace is false.", false, LogType.Error );
+			{
+				bool con = Logger.LogToConsole, 
+				     fil = Logger.LogToFile;
+
+				Logger.LogToConsole = false;
+				Logger.LogToFile    = false;
+
+				bool result = Input.Manager.Actions[ 0 ].Add( a, false );
+
+				Logger.LogToConsole = con;
+				Logger.LogToFile    = fil;
+
+				if( result )
+					return Logger.LogReturn( "Input manager allowed adding an action that already exists when replace is false.", false, LogType.Error );
+			}
 
 			if( !Input.Manager.SaveToFile( InputPath, true ) )
 				return Logger.LogReturn( "Input manager failed saving to file.", false, LogType.Error );

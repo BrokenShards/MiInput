@@ -19,6 +19,12 @@ See `SFInputTest/Example.cs` for example code and usage.
 
 ## Changelog
 
+### Version 0.7.0
+- Added `Input.LastDevice` to easily check the most recent input device type.
+- When loading `ActionSet` or `Input` from xml, the element name is no longer checked to be
+  consistant with other classes.
+- Log messages are now more consistant and concise.
+
 ### Version 0.6.2
 - Fixed issue where `Input.SaveToFile(string,bool)` was not using `Input.DefaultPath` when the
   given path is null.

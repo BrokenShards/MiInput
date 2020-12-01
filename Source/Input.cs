@@ -95,10 +95,11 @@ namespace SFInput
 
 		private Input()
 		{
-			Keyboard = new KeyboardManager();
-			Mouse    = new MouseManager();
-			Joystick = new JoystickManager[ MaxJoysticks ];
-			Actions  = new ActionSet[ MaxJoysticks ];
+			Keyboard   = new KeyboardManager();
+			Mouse      = new MouseManager();
+			Joystick   = new JoystickManager[ MaxJoysticks ];
+			Actions    = new ActionSet[ MaxJoysticks ];
+			LastDevice = InputDevice.Mouse;
 
 			for( uint i = 0; i < MaxJoysticks; i++ )
 			{
@@ -164,6 +165,15 @@ namespace SFInput
 		///   Currently mapped actions for each player.
 		/// </summary>
 		public ActionSet[] Actions
+		{
+			get; private set;
+		}
+
+		/// <summary>
+		///   The device the most recent input came from. Assigned when calling 
+		///   <see cref="Update"/>.
+		/// </summary>
+		public InputDevice LastDevice
 		{
 			get; private set;
 		}
@@ -529,6 +539,15 @@ namespace SFInput
 				Joystick[ i ].Player = i;
 				Joystick[ i ].Update();
 			}
+
+			if( Keyboard.AnyJustPressed() || Keyboard.AnyJustReleased() )
+				LastDevice = InputDevice.Keyboard;
+			else if( Mouse.AnyJustPressed() || Mouse.AnyJustReleased() || Mouse.AnyJustMoved() )
+				LastDevice = InputDevice.Mouse;
+			else
+				for( uint i = 0; i < MaxJoysticks; i++ )
+					if( Joystick[ i ].AnyJustPressed() || Joystick[ i ].AnyJustReleased() || Joystick[ i ].AnyJustMoved() )
+						LastDevice = InputDevice.Joystick;
 		}
 
 		/// <summary>
@@ -543,9 +562,7 @@ namespace SFInput
 		public override bool LoadFromXml( XmlElement element )
 		{
 			if( element == null )
-				return Logger.LogReturn( "Unable to load input: root node is null.", false, LogType.Error );
-			if( element.Name.ToLower() != "input" )
-				return Logger.LogReturn( "Unable to load input: root node name must be \"input\".", false, LogType.Error );
+				return Logger.LogReturn( "Failed loading Input: Null xml element.", false, LogType.Error );
 
 			uint player = 0;
 
@@ -557,7 +574,7 @@ namespace SFInput
 				Actions[ player ] = new ActionSet();
 
 				if( !Actions[ player ].LoadFromXml( x as XmlElement ) )
-					return Logger.LogReturn( "Unable to load action set: action loaded successfully but could not be added.", false, LogType.Error );
+					return Logger.LogReturn( "Failed loading Input: Unable to load ActionSet.", false, LogType.Error );
 
 				player++;
 			}
@@ -588,7 +605,7 @@ namespace SFInput
 			}
 			catch( Exception e )
 			{
-				return Logger.LogReturn( "Unable to load input from file: " + e.Message + ".", false, LogType.Error );
+				return Logger.LogReturn( "Unable to load input from file: " + e.Message, false, LogType.Error );
 			}
 		}
 		/// <summary>

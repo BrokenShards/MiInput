@@ -3,7 +3,7 @@
 ////////////////////////////////////////////////////////////////////////////////
 //
 // MiInput - A basic input manager for use with SFML.Net.
-// Copyright (C) 2020 Michael Furlong <michaeljfurlong@outlook.com>
+// Copyright (C) 2021 Michael Furlong <michaeljfurlong@outlook.com>
 //
 // This program is free software: you can redistribute it and/or modify it 
 // under the terms of the GNU General Public License as published by the Free 
@@ -31,7 +31,7 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyConfiguration( "" )]
 [assembly: AssemblyCompany( "" )]
 [assembly: AssemblyProduct( "MiInputTest" )]
-[assembly: AssemblyCopyright( "Copyright © Michael Furlong 2020" )]
+[assembly: AssemblyCopyright( "Copyright © Michael Furlong 2021" )]
 [assembly: AssemblyTrademark( "" )]
 [assembly: AssemblyCulture( "" )]
 

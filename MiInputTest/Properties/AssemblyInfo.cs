@@ -2,7 +2,7 @@
 // AssemblyInfo.cs 
 ////////////////////////////////////////////////////////////////////////////////
 //
-// SFInput - A basic input manager for use with SFML.Net.
+// MiInput - A basic input manager for use with SFML.Net.
 // Copyright (C) 2020 Michael Furlong <michaeljfurlong@outlook.com>
 //
 // This program is free software: you can redistribute it and/or modify it 
@@ -26,11 +26,11 @@ using System.Runtime.InteropServices;
 // General Information about an assembly is controlled through the following
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
-[assembly: AssemblyTitle( "SFInputTest" )]
+[assembly: AssemblyTitle( "MiInputTest" )]
 [assembly: AssemblyDescription( "" )]
 [assembly: AssemblyConfiguration( "" )]
 [assembly: AssemblyCompany( "" )]
-[assembly: AssemblyProduct( "SFInputTest" )]
+[assembly: AssemblyProduct( "MiInputTest" )]
 [assembly: AssemblyCopyright( "Copyright © Michael Furlong 2020" )]
 [assembly: AssemblyTrademark( "" )]
 [assembly: AssemblyCulture( "" )]

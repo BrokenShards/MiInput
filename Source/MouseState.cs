@@ -2,8 +2,8 @@
 // MouseState.cs 
 ////////////////////////////////////////////////////////////////////////////////
 //
-// SFInput - A basic input manager for use with SFML.Net.
-// Copyright (C) 2020 Michael Furlong <michaeljfurlong@outlook.com>
+// MiInput - A basic input manager for use with SFML.Net.
+// Copyright (C) 2021 Michael Furlong <michaeljfurlong@outlook.com>
 //
 // This program is free software: you can redistribute it and/or modify it 
 // under the terms of the GNU General Public License as published by the Free 
@@ -24,7 +24,7 @@ using System;
 using SFML.System;
 using SFML.Window;
 
-namespace SFInput
+namespace MiInput
 {
 	/// <summary>
 	///   Mouse input axies.

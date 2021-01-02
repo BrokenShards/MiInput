@@ -2,7 +2,7 @@
 // Test.cs 
 ////////////////////////////////////////////////////////////////////////////////
 //
-// SFInput - A basic input manager for use with SFML.Net.
+// MiInput - A basic input manager for use with SFML.Net.
 // Copyright (C) 2020 Michael Furlong <michaeljfurlong@outlook.com>
 //
 // This program is free software: you can redistribute it and/or modify it 
@@ -26,12 +26,12 @@ using System.IO;
 using SFML.Graphics;
 using SFML.Window;
 
-using SFInput;
-using SharpLogger;
+using MiInput;
+using MiCore;
 
-using Action = SFInput.Action;
+using Action = MiInput.Action;
 
-namespace SFInputTest
+namespace MiInputTest
 {
 	static class Test
 	{
@@ -121,7 +121,7 @@ namespace SFInputTest
 
 			Logger.Log( "Press A Button." );
 
-			using( RenderWindow window = new RenderWindow( new VideoMode( 640, 480 ), "SFInput Test", Styles.Close ) )
+			using( RenderWindow window = new RenderWindow( new VideoMode( 640, 480 ), "MiInput Test", Styles.Close ) )
 			{
 				window.Closed += OnClose;
 

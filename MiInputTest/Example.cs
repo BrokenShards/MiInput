@@ -2,13 +2,13 @@
 
 using System;
 using System.IO;
-using SFInput;
+using MiInput;
 using SFML.Window;
 using SFML.Graphics;
 
-using Action = SFInput.Action;
+using Action = MiInput.Action;
 
-namespace SFInputTest
+namespace MiInputTest
 {
 	public static class Example
 	{
@@ -19,7 +19,7 @@ namespace SFInputTest
 			int  exitVal = 0;
 			bool running = true;
 
-			using( RenderWindow window = new RenderWindow( new VideoMode( 640, 480 ), "SFInput", Styles.Close ) )
+			using( RenderWindow window = new RenderWindow( new VideoMode( 640, 480 ), "MiInput", Styles.Close ) )
 			{
 				window.Closed += OnClose;
 

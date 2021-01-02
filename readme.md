@@ -1,23 +1,26 @@
-# SFInput
+# MiInput
 A basic input manager for use with SFML.Net and XInput.
 
-SFInput is a simple action based input manager using SFML.Net for mouse and keyboard input and 
-XInput for joystick input. SFInput was written entirely for my own usage in my own projects, but 
+MiInput is the new name for my old SFInput library.
+
+MiInput is a simple action based input manager using SFML.Net for mouse and keyboard input and 
+XInput for joystick input. MiInput was written entirely for my own usage in my own projects, but 
 if anyone else ends up using it, I am open to suggestions and will attempt to fix any issues.
 
 ## Dependencies
 - SFML.Net `https://github.com/graphnode/SFML.Net.git`
-- SharpID `https://github.com/BrokenShards/SharpID.git`
-- SharpLogger `https://github.com/BrokenShards/SharpLogger.git`
-- SharpSerial `https://github.com/BrokenShards/SharpSerial.git`
+- MiCore `https://github.com/BrokenShards/MiCore.git`
 - XInputDotNetPure `https://github.com/speps/XInputDotNet.git`
 
 ## Usage
-See `SFInputTest/Example.cs` for example code and usage.
+See `MiInputTest/Example.cs` for example code and usage.
 
 ## TO-DO
 
 ## Changelog
+
+### Version 0.8.0
+- Renamed to `MiInput` and updated to use the `MiCore` library.
 
 ### Version 0.7.0
 - Added `Input.LastDevice` to easily check the most recent input device type.
@@ -58,7 +61,7 @@ See `SFInputTest/Example.cs` for example code and usage.
 - Actions now privately contain their input maps and have functions for managing them in order to 
   prevent adding input maps that are either inavlid or collide with existing input maps.
 - Action sets now have the `Clear()` function for removing all actions at once.
-- Added example code in `SFInputTest/Example.cs` and updated tests.
+- Added example code in `MiInputTest/Example.cs` and updated tests.
 
 ### Version 0.3.1
 - Now only XInput is used for the joystick backend making action loading, saving and usage more 

@@ -2,8 +2,8 @@
 // Action.cs 
 ////////////////////////////////////////////////////////////////////////////////
 //
-// SFInput - A basic input manager for use with SFML.Net.
-// Copyright (C) 2020 Michael Furlong <michaeljfurlong@outlook.com>
+// MiInput - A basic input manager for use with SFML.Net.
+// Copyright (C) 2021 Michael Furlong <michaeljfurlong@outlook.com>
 //
 // This program is free software: you can redistribute it and/or modify it 
 // under the terms of the GNU General Public License as published by the Free 
@@ -25,11 +25,9 @@ using System.Collections.Generic;
 using System.Text;
 using System.Xml;
 
-using SharpID;
-using SharpSerial;
-using SharpLogger;
+using MiCore;
 
-namespace SFInput
+namespace MiInput
 {
 	/// <summary>
 	///   A collection of inputs mapped to a name.

@@ -2,7 +2,7 @@
 // Input.cs 
 ////////////////////////////////////////////////////////////////////////////////
 //
-// SFInput - A basic input manager for use with SFML.Net.
+// MiInput - A basic input manager for use with SFML.Net.
 // Copyright (C) 2020 Michael Furlong <michaeljfurlong@outlook.com>
 //
 // This program is free software: you can redistribute it and/or modify it 
@@ -24,10 +24,10 @@ using System;
 using System.IO;
 using System.Text;
 using System.Xml;
-using SharpLogger;
-using SharpSerial;
 
-namespace SFInput
+using MiCore;
+
+namespace MiInput
 {
 	/// <summary>
 	///   Singleton input manager class.

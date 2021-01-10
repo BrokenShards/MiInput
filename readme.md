@@ -15,9 +15,10 @@ if anyone else ends up using it, I am open to suggestions and will attempt to fi
 ## Usage
 See `MiInputTest/Example.cs` for example code and usage.
 
-## TO-DO
-
 ## Changelog
+
+### Version [NEXT]
+- Updated MiCore to version 0.3.0.
 
 ### Version 0.8.0
 - Renamed to `MiInput` and updated to use the `MiCore` library.

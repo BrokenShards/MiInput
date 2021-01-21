@@ -315,6 +315,22 @@
               True if the component is incompatible with the given component type.
             </returns>
         </member>
+        <member name="M:MiCore.MiComponent.TextEntered(SFML.Window.TextEventArgs)">
+            <summary>
+              Called on TextEntered event.
+            </summary>
+            <param name="e">
+              The event args.
+            </param>
+        </member>
+        <member name="M:MiCore.MiComponent.OnTextEntered(SFML.Window.TextEventArgs)">
+            <summary>
+              Override this with your TextEntered logic.
+            </summary>
+            <param name="e">
+              The event args.
+            </param>
+        </member>
         <member name="T:MiCore.ComponentRegister">
             <summary>
               Used for registering and creating components.
@@ -373,7 +389,7 @@
               True if the given component type is registered, otherwise false.
             </returns>
         </member>
-        <member name="M:MiCore.ComponentRegister.Register``1">
+        <member name="M:MiCore.ComponentRegister.Register``1(System.Boolean)">
             <summary>
               Registers a component type.
             </summary>
@@ -381,19 +397,8 @@
               The component type.
             </typeparam>
             <returns>
-              True if the component type was registered successfully and false otherwise.
-            </returns>
-        </member>
-        <member name="M:MiCore.ComponentRegister.Register(System.Type)">
-            <summary>
-              Registers a component type.
-            </summary>
-            <param name="type">
-              The component type.
-            </param>
-            <returns>
-              True if type is a valid component type and was registered successfully, otherwise 
-              null.
+              True if the component type was registered successfully and false otherwise. This will
+              only fail if `T.TypeName` is not a valid ID.
             </returns>
         </member>
         <member name="M:MiCore.ComponentRegister.Create``1">
@@ -416,17 +421,6 @@
             </param>
             <returns>
               A new component if the type name was registered, otherwise false.
-            </returns>
-        </member>
-        <member name="M:MiCore.ComponentRegister.Create(System.Type)">
-            <summary>
-              Creates a component from a given type if it is registered.
-            </summary>
-            <param name="type">
-              The component type.
-            </param>
-            <returns>
-             A new component if the type was registered, otherwise null.
             </returns>
         </member>
         <member name="M:MiCore.ComponentRegister.GetEnumerator">
@@ -480,6 +474,47 @@
             <summary>
               The amount of components the stack contains.
             </summary>
+        </member>
+        <member name="M:MiCore.ComponentStack.GetIncompatibleComponents">
+            <summary>
+              Creates an array containing the names of all components incompatible with the existing
+              components.
+            </summary>
+        </member>
+        <member name="M:MiCore.ComponentStack.IsCompatible``1">
+            <summary>
+              Checks if a given component type is compatible with the current components.
+            </summary>
+            <typeparam name="T">
+              The component type.
+            </typeparam>
+            <returns>
+              True if the component type is registered, compatible and can be added, otherwise false.
+            </returns>
+        </member>
+        <member name="M:MiCore.ComponentStack.IsCompatible(System.String)">
+            <summary>
+              Checks if a given component type name is compatible with the current components.
+            </summary>
+            <param name="typename">
+              The component type name.
+            </param>
+            <returns>
+              True if the component type is registered, compatible and can be added, otherwise false.
+            </returns>
+        </member>
+        <member name="M:MiCore.ComponentStack.IsCompatible(MiCore.MiComponent)">
+            <summary>
+              Checks if a given component and its required components are compatible with the 
+              current components.
+            </summary>
+            <param name="comp">
+              The component.
+            </param>
+            <returns>
+              True if the component and its requirements are registered, compatible and can be 
+              added, otherwise false.
+            </returns>
         </member>
         <member name="M:MiCore.ComponentStack.Contains``1">
             <summary>
@@ -560,6 +595,37 @@
               The component with the given type or null if it does not exist.
             </returns>
         </member>
+        <member name="M:MiCore.ComponentStack.AddNew``1(System.Boolean)">
+            <summary>
+              Adds a new component to the stack.
+            </summary>
+            <typeparam name="T">
+              The component type to add.
+            </typeparam>
+            <param name="replace">
+              Should an already existing component of the same type be replaced?
+            </param>
+            <returns>
+              True if the component was added successfully, otherwise false.
+            </returns>
+        </member>
+        <member name="M:MiCore.ComponentStack.Add``1(``0,System.Boolean)">
+            <summary>
+              Adds a new existing component to the stack.
+            </summary>
+            <typeparam name="T">
+              The component type to add.
+            </typeparam>
+            <param name="comp">
+              The component to add.
+            </param>
+            <param name="replace">
+              Should an already existing component of the same type be replaced?
+            </param>
+            <returns>
+              True if the component was added successfully, otherwise false.
+            </returns>
+        </member>
         <member name="M:MiCore.ComponentStack.Add(MiCore.MiComponent,System.Boolean)">
             <summary>
               Adds a component to the stack.
@@ -574,18 +640,121 @@
               True if the component was added successfully, otherwise false.
             </returns>
         </member>
-        <member name="M:MiCore.ComponentStack.Add``1(System.Boolean)">
+        <member name="M:MiCore.ComponentStack.AddRange(System.Collections.Generic.IEnumerable{MiCore.MiComponent},System.Boolean)">
             <summary>
-              Adds a new component to the stack.
+              Adds a range of components to the stack.
+            </summary>
+            <param name="comps">
+              The component range to add.
+            </param>
+            <param name="replace">
+              If an already existing component should be replaced.
+            </param>
+            <returns>
+              True if comps is not null and all componenta were added successfully, otherwise false.
+            </returns>
+        </member>
+        <member name="M:MiCore.ComponentStack.AddRange(MiCore.ComponentStack,System.Boolean)">
+            <summary>
+              Clones and adds a range of components from another stack.
+            </summary>
+            <param name="stack">
+              The component stack to add.
+            </param>
+            <param name="replace">
+              If an already existing component should be replaced.
+            </param>
+            <returns>
+              True if stack is not null and all componenta were added successfully, otherwise false.
+            </returns>
+        </member>
+        <member name="M:MiCore.ComponentStack.Insert(System.Int32,MiCore.MiComponent,System.Boolean)">
+            <summary>
+              Inserts a component at the given index in the stack.
+            </summary>
+            <param name="index">
+              The index to insert the component. <see cref="M:MiCore.ComponentStack.Add(MiCore.MiComponent,System.Boolean)"/> will be called
+              instead if equals to <see cref="P:MiCore.ComponentStack.Count"/>.
+            </param>
+            <param name="comp">
+              The component to add.
+            </param>
+            <param name="replace">
+              Should an alreadu existing component of the same type be replaced?
+            </param>
+            <returns>
+              True if the component was inserted successfully, otherwise false.
+            </returns>
+        </member>
+        <member name="M:MiCore.ComponentStack.Insert``1(System.Int32,``0,System.Boolean)">
+            <summary>
+              Inserts a component at the given index in the stack.
             </summary>
             <typeparam name="T">
               The component type to add.
             </typeparam>
+            <param name="index">
+              The index to insert the component.
+            </param>
+            <param name="comp">
+              The component to add.
+            </param>
             <param name="replace">
               Should an already existing component of the same type be replaced?
             </param>
             <returns>
               True if the component was added successfully, otherwise false.
+            </returns>
+        </member>
+        <member name="M:MiCore.ComponentStack.InsertNew``1(System.Int32,System.Boolean)">
+            <summary>
+              Inserts a component at the given index in the stack.
+            </summary>
+            <typeparam name="T">
+              The component type to add.
+            </typeparam>
+            <param name="index">
+              The index to insert the component.
+            </param>
+            <param name="replace">
+              Should an already existing component of the same type be replaced?
+            </param>
+            <returns>
+              True if the component was added successfully, otherwise false.
+            </returns>
+        </member>
+        <member name="M:MiCore.ComponentStack.InsertRange(System.Int32,System.Collections.Generic.IEnumerable{MiCore.MiComponent},System.Boolean)">
+            <summary>
+              Inserts a range of components to the stack at the given index.
+            </summary>
+            <param name="index">
+              The index to insert the components.
+            </param>
+            <param name="comps">
+              The component range to add.
+            </param>
+            <param name="replace">
+              If an already existing component should be replaced.
+            </param>
+            <returns>
+              True if comps is not null and all componenta were added successfully, otherwise false.
+            </returns>
+        </member>
+        <member name="M:MiCore.ComponentStack.InsertRange(System.Int32,MiCore.ComponentStack,System.Boolean)">
+            <summary>
+              Inserts a range of components from another stack at the given index.
+            </summary>
+            <param name="index">
+              The index to insert the components.
+            </param>
+            <param name="stack">
+              The component stack to add.
+            </param>
+            <param name="replace">
+              If an already existing component should be replaced.
+            </param>
+            <returns>
+              True if stack is not null and all componenta were added successfully, otherwise false.
             </returns>
         </member>
         <member name="M:MiCore.ComponentStack.Remove``1">
@@ -1510,21 +1679,57 @@
               Inherited from <see cref="M:MiCore.MiObject.#ctor(MiCore.MiObject)"/>.
             </exception>
         </member>
-        <member name="M:MiCore.MiEntity.#ctor(System.String,System.String)">
+        <member name="M:MiCore.MiEntity.#ctor(SFML.Graphics.RenderWindow)">
             <summary>
-              Constructor setting the object ID.
+              Constructor setting the target render window.
+            </summary>
+            <param name="window">
+              The target window.
+            </param>
+        </member>
+        <member name="M:MiCore.MiEntity.#ctor(System.String,SFML.Graphics.RenderWindow)">
+            <summary>
+              Constructor setting the object ID and optionally the target render window.
             </summary>
             <param name="id">
-              The object ID. Will be converted to a valid ID if needed.
+              The object ID.
+            </param>
+            <param name="window">
+              The target window.
+            </param>
+        </member>
+        <member name="M:MiCore.MiEntity.#ctor(System.String,System.String,SFML.Graphics.RenderWindow)">
+            <summary>
+              Constructor setting the object ID, name and optionally the target render window.
+            </summary>
+            <param name="id">
+              The object ID.
             </param>
             <param name="name">
-              The object name or null to generate a ne. Will be corrected if needed.
+              The object name.
+            </param>
+            <param name="window">
+              The target window.
             </param>
         </member>
         <member name="P:MiCore.MiEntity.Components">
             <summary>
               Entity component stack.
             </summary>
+        </member>
+        <member name="P:MiCore.MiEntity.Window">
+            <summary>
+              A reference to the target render window.
+            </summary>
+        </member>
+        <member name="M:MiCore.MiEntity.TextEntered(SFML.Window.TextEventArgs)">
+            <summary>
+              To be called on TextEntered event. Calls <see cref="M:MiCore.MiComponent.OnTextEntered(SFML.Window.TextEventArgs)"/>
+              for all enabled components for this entity and all child entities.
+            </summary>
+            <param name="e">
+              The event args.
+            </param>
         </member>
         <member name="M:MiCore.MiEntity.OnUpdate(System.Single)">
             <summary>

@@ -163,7 +163,6 @@ namespace MiInput
 		/// </summary>
 		public JoystickState()
 		{
-			Player   = Input.Manager.FirstJoystick;
 			m_button = new bool[ ButtonCount ];
 			m_axis   = new float[ AxisCount ];
 			Reset();
@@ -189,30 +188,6 @@ namespace MiInput
 			if( m_axis != null )
 				for( uint i = 0; i < AxisCount; i++ )
 					m_axis[ i ] = js.m_axis[ i ];
-
-			Player = js.Player;
-		}
-		/// <summary>
-		///   Constructs a new state with a given player number.
-		/// </summary>
-		/// <param name="player">
-		///   The player number.
-		/// </param>
-		public JoystickState( uint player )
-		{
-			Player = player;
-			m_button = new bool[ ButtonCount ];
-			m_axis = new float[ AxisCount ];
-			Reset();
-		}
-
-		/// <summary>
-		///   The targeted index of the joystick to update from.
-		/// </summary>
-		public uint Player
-		{
-			get { return m_player; }
-			set { m_player = value >= Input.MaxJoysticks ? 0 : value; }
 		}
 
 		/// <summary>
@@ -220,7 +195,7 @@ namespace MiInput
 		/// </summary>
 		public void Update()
 		{
-			GamePadState state = GamePad.GetState( (PlayerIndex)Player );
+			GamePadState state = GamePad.GetState( (PlayerIndex)Input.Manager.FirstJoystick );
 
 			if( !state.IsConnected )
 			{
@@ -456,7 +431,5 @@ namespace MiInput
 		///   Array containing buttin values.
 		/// </summary>
 		protected bool[] m_button;
-
-		private uint m_player;
 	}
 }

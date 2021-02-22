@@ -65,10 +65,10 @@ namespace MiInputTest
 		{
 			Action act = new Action( "test", new InputMap( InputDevice.Joystick, InputType.Button, "0", "1" ) );
 
-			if( !Input.Manager.Actions[ 0 ].Add( act ) )
+			if( !Input.Manager.Actions.Add( act ) )
 				return Logger.LogReturn( "Unable to add valid action to action set.", false, LogType.Error );
 
-			Action a = Input.Manager.Actions[ 0 ][ "test" ];
+			Action a = Input.Manager.Actions[ "test" ];
 			if( a == null )
 				return Logger.LogReturn( "Unable to retrieve previously added action from the action set.", false, LogType.Error );
 
@@ -79,7 +79,7 @@ namespace MiInputTest
 				Logger.LogToConsole = false;
 				Logger.LogToFile    = false;
 
-				bool result = Input.Manager.Actions[ 0 ].Add( a, false );
+				bool result = Input.Manager.Actions.Add( a, false );
 
 				Logger.LogToConsole = con;
 				Logger.LogToFile    = fil;
@@ -94,9 +94,9 @@ namespace MiInputTest
 			if( !Input.Manager.LoadFromFile( InputPath ) )
 				return Logger.LogReturn( "Input manager failed loading from file.", false, LogType.Error );
 
-			if( !Input.Manager.Actions[ 0 ].Contains( a ) )
+			if( !Input.Manager.Actions.Contains( a ) )
 				return Logger.LogReturn( "Lost mapped input after loading from file.", false, LogType.Error );
-			if( Input.Manager.Actions[ 0 ][ "test" ].Name != act.Name )
+			if( Input.Manager.Actions[ "test" ].Name != act.Name )
 				return Logger.LogReturn( "Input manager did not load from file correctly.", false, LogType.Error );
 
 			try
@@ -114,7 +114,7 @@ namespace MiInputTest
 
 			Action test = new Action( "test", new InputMap( InputDevice.Joystick, InputType.Button, "A", "B" ) );
 
-			if( !Input.Manager.Actions[ 0 ].Add( test, true ) )
+			if( !Input.Manager.Actions.Add( test, true ) )
 				return Logger.LogReturn( "Unable to add test action to input manager.", false, LogType.Error );
 
 			uint press = 0;
@@ -131,13 +131,13 @@ namespace MiInputTest
 
 					Input.Manager.Update();
 
-					if( press == 0 && Input.Manager.Actions[ 0 ][ "test" ].IsPressed )
+					if( press == 0 && Input.Manager.Actions[ "test" ].IsPressed )
 					{
 						Logger.Log( "Press B button." );
 						press++;
 					}
 
-					if( press == 1 && Input.Manager.Actions[ 0 ][ "test" ].IsNegative )
+					if( press == 1 && Input.Manager.Actions[ "test" ].IsNegative )
 						press++;
 
 					if( press > 1 )
@@ -149,7 +149,7 @@ namespace MiInputTest
 				}
 			}
 
-			Input.Manager.Actions[ 0 ].Remove( "test" );
+			Input.Manager.Actions.Remove( "test" );
 			return true;
 		}
 

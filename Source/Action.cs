@@ -292,7 +292,7 @@ namespace MiInput
 					{
 						float v = map.Device == InputDevice.Mouse ?
 						          Input.Manager.Mouse.GetAxis( m_inputs[ i ].Value ) :
-								  Input.Manager.Joystick[ Input.Manager.FirstJoystick ].GetAxis( m_inputs[ i ].Value );
+								  Input.Manager.Joystick.GetAxis( m_inputs[ i ].Value );
 
 						if( v != 0.0f )
 							return map.Invert ? -v : v;
@@ -301,10 +301,10 @@ namespace MiInput
 					{
 						bool p = map.Device == InputDevice.Keyboard ? Input.Manager.Keyboard.IsPressed( m_inputs[ i ].Value ) :
 						       ( map.Device == InputDevice.Mouse    ? Input.Manager.Mouse.IsPressed( m_inputs[ i ].Value ) :
-						       ( map.Device == InputDevice.Joystick ? Input.Manager.Joystick[ Input.Manager.FirstJoystick ].IsPressed( m_inputs[ i ].Value ) : false ) );
+						       ( map.Device == InputDevice.Joystick ? Input.Manager.Joystick.IsPressed( m_inputs[ i ].Value ) : false ) );
 						bool n = map.Device == InputDevice.Keyboard ? Input.Manager.Keyboard.IsPressed( m_inputs[ i ].Negative ) :
 							   ( map.Device == InputDevice.Mouse    ? Input.Manager.Mouse.IsPressed( m_inputs[ i ].Negative ) :
-							   ( map.Device == InputDevice.Joystick ? Input.Manager.Joystick[ Input.Manager.FirstJoystick ].IsPressed( m_inputs[ i ].Negative ) : false ) );
+							   ( map.Device == InputDevice.Joystick ? Input.Manager.Joystick.IsPressed( m_inputs[ i ].Negative ) : false ) );
 
 						if( ( p && n ) || ( !p && !n ) )
 							continue;
@@ -446,12 +446,13 @@ namespace MiInput
 			if( ele == null )
 				return Logger.LogReturn( "Failed loading Action: Null xml element.", false, LogType.Error );
 
-			string name = ele.GetAttribute( "name" );
+			if( !ele.HasAttribute( nameof( Name ) ) )
+				return Logger.LogReturn( "Failed loading Action: No Name attribute.", false, LogType.Error );
 
-			if( string.IsNullOrWhiteSpace( name ) )
-				return Logger.LogReturn( "Failed loading Action: No name attribute.", false, LogType.Error );
+			string name = ele.GetAttribute( nameof( Name ) );
+
 			if( !Naming.IsValid( name ) )
-				return Logger.LogReturn( "Failed loading Action: Invalid name attribute.", false, LogType.Error );
+				return Logger.LogReturn( "Failed loading Action: Invalid Name attribute.", false, LogType.Error );
 
 			Name = name;
 			
@@ -483,7 +484,13 @@ namespace MiInput
 		{
 			StringBuilder sb = new StringBuilder();
 
-			sb.Append( "<action name=\"" ); sb.Append( Name ); sb.AppendLine( "\">" );
+			sb.Append( "<" );
+			sb.Append( nameof( Action ) );
+			sb.Append( " " );
+			sb.Append( nameof( Name ) );
+			sb.Append( "=\"" );
+			sb.Append( Name );
+			sb.AppendLine( "\">" );
 
 			foreach( InputMap p in m_inputs )
 			{
@@ -493,7 +500,9 @@ namespace MiInput
 				sb.AppendLine( p.ToString( 1 ) );
 			}
 
-			sb.Append( "</action>" );
+			sb.Append( "</" );
+			sb.Append( nameof( Action ) );
+			sb.AppendLine( ">" );
 			return sb.ToString();
 		}
 

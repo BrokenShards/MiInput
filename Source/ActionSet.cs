@@ -284,7 +284,7 @@ namespace MiInput
 
 			Clear();
 
-			foreach( var x in element.SelectNodes( "action" ) )
+			foreach( var x in element.SelectNodes( nameof( Action ) ) )
 			{
 				Action a = new Action();
 
@@ -305,17 +305,22 @@ namespace MiInput
 		/// </returns>
 		public override string ToString()
 		{
-			if( Empty )
-				return "<action_set/>";
-
 			StringBuilder sb = new StringBuilder();
 
-			sb.AppendLine( "<action_set>" );
+			sb.Append( "<" );
+			sb.Append( nameof( ActionSet ) );
 
+			if( Empty )
+				return sb.ToString() + "/>";
+
+			sb.AppendLine( ">" );
+			
 			foreach( var ac in m_actions )
 				sb.AppendLine( ac.Value.ToString( 1 ) );
 
-			sb.Append( "</action_set>" );
+			sb.Append( "</" );
+			sb.Append( nameof( ActionSet ) );
+			sb.AppendLine( ">" );
 			return sb.ToString();
 		}
 

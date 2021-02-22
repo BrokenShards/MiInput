@@ -260,38 +260,40 @@ namespace MiInput
 
 			// Device
 			{
-				string device = ele.GetAttribute( "device" );
-
-				if( string.IsNullOrWhiteSpace( device ) )
-					return Logger.LogReturn( "Failed loading InputMap: No device attribute.", false, LogType.Error );
-				else if( !Enum.TryParse( device, true, out InputDevice dev ) )
-					return Logger.LogReturn( "Failed loading InputMap: Invalid device attribute.", false, LogType.Error );
-				else
-					Device = dev;
+				if( !ele.HasAttribute( nameof( Device ) ) )
+					return Logger.LogReturn( "Failed loading InputMap: No Device attribute.", false, LogType.Error );					
+				if( !Enum.TryParse( ele.GetAttribute( nameof( Device ) ), true, out InputDevice dev ) )
+					return Logger.LogReturn( "Failed loading InputMap: Invalid Device attribute.", false, LogType.Error );
+				
+				Device = dev;
 			}
 
 			// Value
 			{
-				string val = ele.GetAttribute( "value" ),
-				       neg = ele.GetAttribute( "negative" );
+				if( !ele.HasAttribute( nameof( Value ) ) && !ele.HasAttribute( "Positive" ) &&
+					!ele.HasAttribute( nameof( Negative ) ) )
+					return Logger.LogReturn( "Failed loading InputMap: No Positive and Negative or Value attributes.", false, LogType.Error );
+
+				string val = ele.GetAttribute( nameof( Value ) ),
+				       neg = ele.GetAttribute( nameof( Negative ) );
 
 				if( string.IsNullOrWhiteSpace( val ) )
-					val = ele.GetAttribute( "positive" );
+					val = ele.GetAttribute( "Positive" );
 
 				if( string.IsNullOrWhiteSpace( val ) )
 					val = null;
 				if( string.IsNullOrWhiteSpace( neg ) )
 					neg = null;
-
+				
 				if( val == null && neg == null )
-					return Logger.LogReturn( "Failed loading InputMap: No positive and negative or value attributes.", false, LogType.Error );
+					return Logger.LogReturn( "Failed loading InputMap: Invalid Positive, Negative and/or Value attributes.", false, LogType.Error );
 
 				if( Device == InputDevice.Keyboard )
 				{
 					if( val != null && !KeyboardManager.IsKey( val ) )
-						return Logger.LogReturn( "Failed loading InputMap: Invalid positive or value attribute.", false, LogType.Error );
+						return Logger.LogReturn( "Failed loading InputMap: Invalid Positive or Value attribute.", false, LogType.Error );
 					if( neg != null && !KeyboardManager.IsKey( neg ) )
-						return Logger.LogReturn( "Failed loading InputMap: Invalid negative attribute.", false, LogType.Error );
+						return Logger.LogReturn( "Failed loading InputMap: Invalid Negative attribute.", false, LogType.Error );
 				}
 				else if( Device == InputDevice.Mouse )
 				{
@@ -303,9 +305,9 @@ namespace MiInput
 					else if( Type == InputType.Button )
 					{
 						if( val != null && !MouseManager.IsButton( val ) )
-							return Logger.LogReturn( "Failed loading InputMap: Invalid positive or value attribute.", false, LogType.Error );
+							return Logger.LogReturn( "Failed loading InputMap: Invalid Positive or Value attribute.", false, LogType.Error );
 						if( neg != null && !MouseManager.IsButton( neg ) )
-							return Logger.LogReturn( "Failed loading InputMap: Invalid negative attribute.", false, LogType.Error );
+							return Logger.LogReturn( "Failed loading InputMap: Invalid Negative attribute.", false, LogType.Error );
 					}
 				}
 				else if( Device == InputDevice.Joystick )
@@ -318,9 +320,9 @@ namespace MiInput
 					else if( Type == InputType.Button )
 					{
 						if( val != null && !JoystickManager.IsButton( val ) )
-							return Logger.LogReturn( "Failed loading InputMap: Invalid positive or value attribute.", false, LogType.Error );
+							return Logger.LogReturn( "Failed loading InputMap: Invalid Positive or Value attribute.", false, LogType.Error );
 						if( neg != null && !JoystickManager.IsButton( neg ) )
-							return Logger.LogReturn( "Failed loading InputMap: Invalid negative attribute.", false, LogType.Error );
+							return Logger.LogReturn( "Failed loading InputMap: Invalid Negative attribute.", false, LogType.Error );
 					}
 				}
 
@@ -330,15 +332,18 @@ namespace MiInput
 
 			// Invert
 			{
-				string invert = ele.GetAttribute( "invert" );
+				if( ele.HasAttribute( nameof( Invert ) ) )
+				{
+					string invert = ele.GetAttribute( nameof( Invert ) );
 
-				if( string.IsNullOrWhiteSpace( invert ) )
-					return Logger.LogReturn( "Failed loading InputMap: No invert attribute.", false, LogType.Error );
+					if( string.IsNullOrWhiteSpace( invert ) )
+						return Logger.LogReturn( "Failed loading InputMap: Invalid Invert attribute.", false, LogType.Error );
+					if( !bool.TryParse( invert, out bool i ) )
+						return Logger.LogReturn( "Failed loading InputMap: Unable to parse Invert attribute.", false, LogType.Error );
 
-				if( !bool.TryParse( invert, out bool i ) )
-					return Logger.LogReturn( "Failed loading InputMap: Invalid invert attribute.", false, LogType.Error );
-
-				Invert = i;
+					Invert = i;
+				}
+				
 			}
 
 			return true;
@@ -356,33 +361,38 @@ namespace MiInput
 
 			string spacer = Type == InputType.Button ? "        " : "      ";
 
-			sb.Append( Type == InputType.Button ? "<button " : "<axis " );
-			sb.Append( "device=\"" );
+			sb.Append( Type == InputType.Button ? "<Button " : "<Axis " );
+			sb.Append( nameof( Device ) );
+			sb.Append( "=\"" );
 			sb.Append( Device.ToString() );
 			sb.AppendLine( "\"" );
 
 			if( Type == InputType.Axis )
 			{
 				sb.Append( spacer );
-				sb.Append( "value=\"" );
+				sb.Append( nameof( Value ) );
+				sb.Append( "=\"" );
 				sb.Append( string.IsNullOrWhiteSpace( Value ) ? string.Empty : Value );
 				sb.AppendLine( "\"" );
 			}
 			else if( Type == InputType.Button )
 			{
 				sb.Append( spacer );
-				sb.Append( "positive=\"" );
+				sb.Append( "Positive" );
+				sb.Append( "=\"" );
 				sb.Append( string.IsNullOrWhiteSpace( Value ) ? string.Empty : Value );
 				sb.AppendLine( "\"" );
 
 				sb.Append( spacer );
-				sb.Append( "negative=\"" );
+				sb.Append( nameof( Negative ) );
+				sb.Append( "=\"" );
 				sb.Append( string.IsNullOrWhiteSpace( Negative ) ? string.Empty : Negative );
 				sb.AppendLine( "\"" );
 			}
 
 			sb.Append( spacer );
-			sb.Append( "invert=\"" );
+			sb.Append( nameof( Invert ) );
+			sb.Append( "=\"" );
 			sb.Append( Invert );
 			sb.Append( "\"/>" );
 

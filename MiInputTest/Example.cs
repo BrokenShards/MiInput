@@ -32,7 +32,7 @@ namespace MiInputTest
 						                         new InputMap( InputDevice.Keyboard, InputType.Button, "D", "A" ) );
 
 						// Add action to action set, replacing an already existing action with the same ID.
-						if( !Input.Manager.Actions[ 0 ].Add( hor, true ) )
+						if( !Input.Manager.Actions.Add( hor, true ) )
 						{
 							Console.WriteLine( "Failed adding action to set (is the action valid?)" );
 							exitVal = -1;
@@ -42,7 +42,7 @@ namespace MiInputTest
 
 					// Retrieve assigned action.
 					{
-						Action a = Input.Manager.Actions[ 0 ][ "horizontal" ];
+						Action a = Input.Manager.Actions[ "horizontal" ];
 
 						if( a == null )
 						{
@@ -70,7 +70,7 @@ namespace MiInputTest
 
 					// Access assigned action.
 					{
-						Action horizontal = Input.Manager.Actions[ 0 ][ "horizontal" ];
+						Action horizontal = Input.Manager.Actions[ "horizontal" ];
 
 						if( horizontal == null )
 						{
@@ -96,7 +96,7 @@ namespace MiInputTest
 					Input.Manager.Update();
 
 					lastX = thisX;
-					thisX = Input.Manager.Actions[ 0 ][ "horizontal" ].Value;
+					thisX = Input.Manager.Actions[ "horizontal" ].Value;
 
 					// Only print horizontal action value if it changed.
 					if( thisX != lastX )

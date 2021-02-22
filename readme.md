@@ -17,6 +17,11 @@ See `MiInputTest/Example.cs` for example code and usage.
 
 ## Changelog
 
+### Version 0.10.0
+- Now `JoystickState` and `JoystickManager` just use the first connected joystick rather than 
+  specifying the player index, because of this, `Input.Actions` is no longer an array.
+- Updated MiCore to version 0.9.0.
+
 ### Version 0.9.0
 - Changed SFML source to latest official SFML.Net repository.
 - Updated MiCore to version 0.5.0.

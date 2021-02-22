@@ -128,8 +128,8 @@ namespace MiInput
 		/// </summary>
 		public JoystickManager()
 		{
-			m_last    = new JoystickState( 0 );
-			m_current = new JoystickState( 0 );
+			m_last    = new JoystickState();
+			m_current = new JoystickState();
 		}
 		/// <summary>
 		///   Copy constructor.
@@ -142,33 +142,13 @@ namespace MiInput
 			m_last    = new JoystickState( man.m_last );
 			m_current = new JoystickState( man.m_current );
 		}
-		/// <summary>
-		///   Constructor that sets player index.
-		/// </summary>
-		/// <param name="player">
-		///   The player index.
-		/// </param>
-		public JoystickManager( uint player )
-		{
-			m_last    = new JoystickState( player );
-			m_current = new JoystickState( player );
-		}
-
-		/// <summary>
-		///   The targeted index of the joystick to update from.
-		/// </summary>
-		public uint Player
-		{
-			get { return m_current.Player; }
-			set { m_current.Player = value; }
-		}
 
 		/// <summary>
 		///   If the joystick is connected.
 		/// </summary>
 		public bool IsConnected
 		{
-			get { return GamePad.GetState( (PlayerIndex)Player ).IsConnected; }
+			get { return GamePad.GetState( (PlayerIndex)FirstConnected ).IsConnected; }
 		}
 
 		/// <summary>

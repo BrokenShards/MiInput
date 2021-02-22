@@ -97,15 +97,9 @@ namespace MiInput
 		{
 			Keyboard   = new KeyboardManager();
 			Mouse      = new MouseManager();
-			Joystick   = new JoystickManager[ MaxJoysticks ];
-			Actions    = new ActionSet[ MaxJoysticks ];
+			Joystick   = new JoystickManager();
+			Actions    = new ActionSet();
 			LastDevice = InputDevice.Mouse;
-
-			for( uint i = 0; i < MaxJoysticks; i++ )
-			{
-				Joystick[ i ] = new JoystickManager( i );
-				Actions[ i ]  = new ActionSet();
-			}
 		}
 
 		/// <summary>
@@ -146,9 +140,9 @@ namespace MiInput
 		}
 
 		/// <summary>
-		///   Array of joystick managers for each player.
+		///   Joystick manager.
 		/// </summary>
-		public JoystickManager[] Joystick
+		public JoystickManager Joystick
 		{
 			get; private set;
 		}
@@ -158,13 +152,13 @@ namespace MiInput
 		/// </summary>
 		public uint FirstJoystick
 		{
-			get { return Joystick[ 0 ].FirstConnected; }
+			get { return Joystick.FirstConnected; }
 		}
 		
 		/// <summary>
 		///   Currently mapped actions for each player.
 		/// </summary>
-		public ActionSet[] Actions
+		public ActionSet Actions
 		{
 			get; private set;
 		}
@@ -192,7 +186,7 @@ namespace MiInput
 			if( player >= MaxJoysticks )
 				return false;
 
-			return Joystick[ player ].IsConnected;
+			return Joystick.IsConnected;
 		}
 
 		/// <summary>
@@ -214,12 +208,7 @@ namespace MiInput
 			else if( dev == InputDevice.Mouse )
 				return Mouse.IsPressed( but );
 			else if( dev == InputDevice.Joystick )
-			{
-				uint first = FirstJoystick;
-
-				if( first < MaxJoysticks )
-					return Joystick[ first ].IsPressed( but );
-			}
+				return Joystick.IsPressed( but );
 
 			return false;
 		}
@@ -242,12 +231,7 @@ namespace MiInput
 			else if( dev == InputDevice.Mouse )
 				return Mouse.JustPressed( but );
 			else if( dev == InputDevice.Joystick )
-			{
-				uint first = FirstJoystick;
-
-				if( first < MaxJoysticks )
-					return Joystick[ first ].JustPressed( but );
-			}
+				return Joystick.JustPressed( but );
 
 			return false;
 		}
@@ -270,12 +254,7 @@ namespace MiInput
 			else if( dev == InputDevice.Mouse )
 				return Mouse.JustReleased( but );
 			else if( dev == InputDevice.Joystick )
-			{
-				uint first = FirstJoystick;
-
-				if( first < MaxJoysticks )
-					return Joystick[ first ].JustReleased( but );
-			}
+				return Joystick.JustReleased( but );
 
 			return false;
 		}
@@ -297,12 +276,7 @@ namespace MiInput
 			if( dev == InputDevice.Mouse )
 				return Mouse.GetAxis( axis );
 			else if( dev == InputDevice.Joystick )
-			{
-				uint first = FirstJoystick;
-
-				if( first < MaxJoysticks )
-					return Joystick[ first ].GetAxis( axis );
-			}
+				return Joystick.GetAxis( axis );			
 
 			return 0.0f;
 		}
@@ -323,12 +297,7 @@ namespace MiInput
 			if( dev == InputDevice.Mouse )
 				return Mouse.GetLastAxis( axis );
 			else if( dev == InputDevice.Joystick )
-			{
-				uint first = FirstJoystick;
-
-				if( first < MaxJoysticks )
-					return Joystick[ first ].GetLastAxis( axis );
-			}
+				return Joystick.GetLastAxis( axis );
 
 			return 0.0f;
 		}
@@ -349,12 +318,7 @@ namespace MiInput
 			if( dev == InputDevice.Mouse )
 				return Mouse.AxisDelta( axis );
 			else if( dev == InputDevice.Joystick )
-			{
-				uint first = FirstJoystick;
-
-				if( first < MaxJoysticks )
-					return Joystick[ first ].AxisDelta( axis );
-			}
+				return Joystick.AxisDelta( axis );
 
 			return 0.0f;
 		}
@@ -375,12 +339,7 @@ namespace MiInput
 			if( dev == InputDevice.Mouse )
 				return Mouse.AxisIsPressed( axis );
 			else if( dev == InputDevice.Joystick )
-			{
-				uint first = FirstJoystick;
-
-				if( first < MaxJoysticks )
-					return Joystick[ first ].AxisIsPressed( axis );
-			}
+				return Joystick.AxisIsPressed( axis );
 
 			return false;
 		}
@@ -401,12 +360,7 @@ namespace MiInput
 			if( dev == InputDevice.Mouse )
 				return Mouse.AxisJustPressed( axis );
 			else if( dev == InputDevice.Joystick )
-			{
-				uint first = FirstJoystick;
-
-				if( first < MaxJoysticks )
-					return Joystick[ first ].AxisJustPressed( axis );
-			}
+				return Joystick.AxisJustPressed( axis );
 
 			return false;
 		}
@@ -427,12 +381,7 @@ namespace MiInput
 			if( dev == InputDevice.Mouse )
 				return Mouse.AxisJustReleased( axis );
 			else if( dev == InputDevice.Joystick )
-			{
-				uint first = FirstJoystick;
-
-				if( first < MaxJoysticks )
-					return Joystick[ first ].AxisJustReleased( axis );
-			}
+				return Joystick.AxisJustReleased( axis );
 
 			return false;
 		}
@@ -443,21 +392,15 @@ namespace MiInput
 		/// <param name="action">
 		///   The name of the mapped action.
 		/// </param>
-		/// <param name="player">
-		///   The player index.
-		/// </param>
 		/// <returns>
 		///   True if index and action are valid, mapped and pressed, otherwise false.
 		/// </returns>
 		/// <exception cref="ArgumentOutOfRangeException">
 		///   If player greater than or equal to <see cref="MaxJoysticks"/>.
 		/// </exception>
-		public bool IsPressed( string action, uint player = 0 )
+		public bool IsPressed( string action )
 		{
-			if( player >= Actions.Length )
-				throw new ArgumentOutOfRangeException();
-
-			return Actions[ player ].Get( action )?.IsPressed ?? false;
+			return Actions.Get( action )?.IsPressed ?? false;
 		}
 		/// <summary>
 		///   Checks if the input mapped to action was just pressed.
@@ -476,10 +419,7 @@ namespace MiInput
 		/// </exception>
 		public bool JustPressed( string action, uint player = 0 )
 		{
-			if( player >= Actions.Length )
-				throw new ArgumentOutOfRangeException();
-
-			return Actions[ player ].Get( action )?.JustPressed ?? false;
+			return Actions.Get( action )?.JustPressed ?? false;
 		}
 		/// <summary>
 		///   Checks if the input mapped to action was just released.
@@ -498,10 +438,7 @@ namespace MiInput
 		/// </exception>
 		public bool JustReleased( string action, uint player = 0 )
 		{
-			if( player >= Actions.Length )
-				throw new ArgumentOutOfRangeException();
-
-			return Actions[ player ].Get( action )?.JustReleased ?? false;
+			return Actions.Get( action )?.JustReleased ?? false;
 		}
 		/// <summary>
 		///   Gets the current value of the action.
@@ -520,10 +457,7 @@ namespace MiInput
 		/// </exception>
 		public float GetValue( string action, uint player = 0 )
 		{
-			if( player >= Actions.Length )
-				throw new ArgumentOutOfRangeException();
-
-			return Actions[ player ].Get( action )?.Value ?? 0.0f;
+			return Actions.Get( action )?.Value ?? 0.0f;
 		}
 
 		/// <summary>
@@ -533,21 +467,15 @@ namespace MiInput
 		{
 			Keyboard.Update();
 			Mouse.Update();
-
-			for( uint i = 0; i < MaxJoysticks; i++ )
-			{
-				Joystick[ i ].Player = i;
-				Joystick[ i ].Update();
-			}
+			Joystick.Update();
 
 			if( Keyboard.AnyJustPressed() || Keyboard.AnyJustReleased() )
 				LastDevice = InputDevice.Keyboard;
 			else if( Mouse.AnyJustPressed() || Mouse.AnyJustReleased() || Mouse.AnyJustMoved() )
 				LastDevice = InputDevice.Mouse;
 			else
-				for( uint i = 0; i < MaxJoysticks; i++ )
-					if( Joystick[ i ].AnyJustPressed() || Joystick[ i ].AnyJustReleased() || Joystick[ i ].AnyJustMoved() )
-						LastDevice = InputDevice.Joystick;
+				if( Joystick.AnyJustPressed() || Joystick.AnyJustReleased() || Joystick.AnyJustMoved() )
+					LastDevice = InputDevice.Joystick;
 		}
 
 		/// <summary>
@@ -564,20 +492,15 @@ namespace MiInput
 			if( element == null )
 				return Logger.LogReturn( "Failed loading Input: Null xml element.", false, LogType.Error );
 
-			uint player = 0;
+			XmlElement set = element[ nameof( ActionSet ) ];
 
-			foreach( var x in element.SelectNodes( "action_set" ) )
-			{
-				if( player >= MaxJoysticks )
-					break;
+			if( set == null )
+				return Logger.LogReturn( "Failed loading Input: No ActionSet element.", false, LogType.Error );
 
-				Actions[ player ] = new ActionSet();
+			Actions = new ActionSet();
 
-				if( !Actions[ player ].LoadFromXml( x as XmlElement ) )
-					return Logger.LogReturn( "Failed loading Input: Unable to load ActionSet.", false, LogType.Error );
-
-				player++;
-			}
+			if( !Actions.LoadFromXml( set ) )
+				return Logger.LogReturn( "Failed loading Input: Unable to load ActionSet.", false, LogType.Error );
 
 			return true;
 		}
@@ -638,12 +561,15 @@ namespace MiInput
 		{
 			StringBuilder sb = new StringBuilder();
 
-			sb.AppendLine( "<input>" );
+			sb.Append( "<" );
+			sb.Append( nameof( Input ) );
+			sb.AppendLine( ">" );
 
-			for( uint i = 0; i < MaxJoysticks; i++ )
-				sb.AppendLine( Actions[ i ].ToString( 1 ) );
+			sb.AppendLine( Actions.ToString( 1 ) );
 
-			sb.Append( "</input>" );
+			sb.Append( "</" );
+			sb.Append( nameof( Input ) );
+			sb.AppendLine( ">" );
 
 			return sb.ToString();
 		}

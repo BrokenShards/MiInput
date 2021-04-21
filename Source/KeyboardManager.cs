@@ -47,11 +47,11 @@ namespace MiInput
 			if( string.IsNullOrEmpty( val ) )
 				return false;
 
-			if( !Enum.TryParse( val, true, out Keyboard.Key key ) )
+			if( !Enum.TryParse( val, true, out Key key ) )
 			{
 				if( uint.TryParse( val, out uint b ) )
 				{
-					if( b >= (uint)Keyboard.Key.KeyCount )
+					if( b >= (uint)Key.KeyCount )
 						return false;
 				}
 				else
@@ -67,16 +67,16 @@ namespace MiInput
 		///   The string to parse.
 		/// </param>
 		/// <returns>
-		///   The keyboard key parsed from the string on success or null on failure.
+		///   The keyboard key parsed from the string on success or Key.KeyCount on failure.
 		/// </returns>
-		public static Keyboard.Key ToKey( string val )
+		public static Key ToKey( string val )
 		{
-			if( Enum.TryParse( val, true, out Keyboard.Key key ) )
+			if( Enum.TryParse( val, true, out Key key ) )
 				return key;
-			if( uint.TryParse( val, out uint k ) && k < (uint)Keyboard.Key.KeyCount )
-				return (Keyboard.Key)k;
+			if( uint.TryParse( val, out uint k ) && k < (uint)Key.KeyCount )
+				return (Key)k;
 
-			return Keyboard.Key.Unknown;
+			return Key.KeyCount;
 		}
 		
 		/// <summary>
@@ -148,7 +148,7 @@ namespace MiInput
 		/// <returns>
 		///   True if the key index is valid and the key is pressed, otherwise false.
 		/// </returns>
-		public bool IsPressed( Keyboard.Key key )
+		public bool IsPressed( Key key )
 		{
 			return m_current.IsPressed( key );
 		}
@@ -188,7 +188,7 @@ namespace MiInput
 		/// <returns>
 		///   True if the key index is valid and the key has just been pressed, otherwise false.
 		/// </returns>
-		public bool JustPressed( Keyboard.Key key )
+		public bool JustPressed( Key key )
 		{
 			return m_current.IsPressed( key ) && !m_last.IsPressed( key );
 		}
@@ -228,7 +228,7 @@ namespace MiInput
 		/// <returns>
 		///   True if the key index is valid and the key has just been released, otherwise false.
 		/// </returns>
-		public bool JustReleased( Keyboard.Key key )
+		public bool JustReleased( Key key )
 		{
 			return !m_current.IsPressed( key ) && m_last.IsPressed( key );
 		}
@@ -241,7 +241,7 @@ namespace MiInput
 		/// </returns>
 		public bool AnyPressed()
 		{
-			for( Keyboard.Key k = 0; k < Keyboard.Key.KeyCount; k++ )
+			for( Key k = 0; k < Key.KeyCount; k++ )
 				if( IsPressed( k ) )
 					return true;
 
@@ -255,7 +255,7 @@ namespace MiInput
 		/// </returns>
 		public bool AnyJustPressed()
 		{
-			for( Keyboard.Key k = 0; k < Keyboard.Key.KeyCount; k++ )
+			for( Key k = 0; k < Key.KeyCount; k++ )
 				if( JustPressed( k ) )
 					return true;
 
@@ -269,7 +269,7 @@ namespace MiInput
 		/// </returns>
 		public bool AnyJustReleased()
 		{
-			for( Keyboard.Key k = 0; k < Keyboard.Key.KeyCount; k++ )
+			for( Key k = 0; k < Key.KeyCount; k++ )
 				if( JustReleased( k ) )
 					return true;
 

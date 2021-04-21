@@ -3,8 +3,8 @@ A basic input manager for use with SFML.Net and XInput.
 
 MiInput is the new name for my old SFInput library.
 
-MiInput is a simple action based input manager using SFML.Net for mouse and keyboard input and 
-XInput for joystick input. MiInput was written entirely for my own usage in my own projects, but 
+MiInput is a simple action based input manager using SFML.Net for mouse and keyboard input and
+XInput for joystick input. MiInput was written entirely for my own usage in my own projects, but
 if anyone else ends up using it, I am open to suggestions and will attempt to fix any issues.
 
 ## Dependencies
@@ -17,8 +17,14 @@ See `MiInputTest/Example.cs` for example code and usage.
 
 ## Changelog
 
+### Version 0.11.0
+- Instead of directly using the `SFML.Window.Keyboard.Key` enum for keyboard events, a clone enum
+  'Key' is used instead. `Key` does not include `Key.Unknown` or the depreciated keys so iterating
+  over `Enum.GetNames` ensures the index is the same as the enum value.
+- Updated MiCore to version 0.10.0.
+
 ### Version 0.10.0
-- Now `JoystickState` and `JoystickManager` just use the first connected joystick rather than 
+- Now `JoystickState` and `JoystickManager` just use the first connected joystick rather than
   specifying the player index, because of this, `Input.Actions` is no longer an array.
 - Updated MiCore to version 0.9.0.
 
@@ -47,9 +53,9 @@ See `MiInputTest/Example.cs` for example code and usage.
   moved.
 
 ### Version 0.6.0
-- Now SharpSerial is used as an interface to load and save `InputMap`, `Action`, `ActionSet` and 
+- Now SharpSerial is used as an interface to load and save `InputMap`, `Action`, `ActionSet` and
   `Input` to and from file.
-- `Input.Actions` is now an array containing an action set for each player rather than just a 
+- `Input.Actions` is now an array containing an action set for each player rather than just a
   single action set.
 - Corrected joystick trigger axis logic.
 
@@ -65,23 +71,23 @@ See `MiInputTest/Example.cs` for example code and usage.
 - Dependency source is now clearly shown in the readme.
 
 ### Version 0.4.0
-- Actions now privately contain their input maps and have functions for managing them in order to 
+- Actions now privately contain their input maps and have functions for managing them in order to
   prevent adding input maps that are either inavlid or collide with existing input maps.
 - Action sets now have the `Clear()` function for removing all actions at once.
 - Added example code in `MiInputTest/Example.cs` and updated tests.
 
 ### Version 0.3.1
-- Now only XInput is used for the joystick backend making action loading, saving and usage more 
+- Now only XInput is used for the joystick backend making action loading, saving and usage more
   consistent.
 
 ### Version 0.3.0
-- Restructured project to reduce repeated code and seperate SFML and XInput joystick 
+- Restructured project to reduce repeated code and seperate SFML and XInput joystick
   implementations.
-- Changing between SFML and XInput joystick input backends will invalidate actions and is now 
+- Changing between SFML and XInput joystick input backends will invalidate actions and is now
   stated.
 
 ### Version 0.2.0
-- Now XInput can be used for the joystick backend. This is enabled by default and can be changed 
+- Now XInput can be used for the joystick backend. This is enabled by default and can be changed
   on the fly.
 - Cleaned up API for less verbose usage.
 

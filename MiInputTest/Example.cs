@@ -19,7 +19,7 @@ namespace MiInputTest
 			int  exitVal = 0;
 			bool running = true;
 
-			using( RenderWindow window = new RenderWindow( new VideoMode( 640, 480 ), "MiInput", Styles.Close ) )
+			using( RenderWindow window = new( new VideoMode( 640, 480 ), "MiInput", Styles.Close ) )
 			{
 				window.Closed += OnClose;
 
@@ -27,9 +27,9 @@ namespace MiInputTest
 				{
 					// Create action.
 					{
-						Action hor = new Action( "horizontal", 
-						                         new InputMap( InputDevice.Joystick, InputType.Axis, "LeftStickX" ), 
-						                         new InputMap( InputDevice.Keyboard, InputType.Button, "D", "A" ) );
+						Action hor = new( "horizontal", 
+						                  new InputMap( InputDevice.Joystick, InputType.Axis, "LeftStickX" ), 
+						                  new InputMap( InputDevice.Keyboard, InputType.Button, "D", "A" ) );
 
 						// Add action to action set, replacing an already existing action with the same ID.
 						if( !Input.Manager.Actions.Add( hor, true ) )
@@ -44,7 +44,7 @@ namespace MiInputTest
 					{
 						Action a = Input.Manager.Actions[ "horizontal" ];
 
-						if( a == null )
+						if( a is null )
 						{
 							Console.WriteLine( "Unable to retrieve previously added action from the action set." );
 							exitVal = -2;

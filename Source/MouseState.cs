@@ -81,17 +81,17 @@ namespace MiInput
 		/// </exception>
 		public MouseState( MouseState state )
 		{
-			if( state == null )
-				throw new ArgumentNullException();
+			if( state is null )
+				throw new ArgumentNullException( nameof( state ) );
 
 			m_button = ButtonCount > 0 ? new bool[ ButtonCount ] : null;
 			m_axis = AxisCount > 0 ? new float[ AxisCount ] : null;
 
-			if( m_button != null )
+			if( m_button is not null )
 				for( uint i = 0; i < ButtonCount; i++ )
 					m_button[ i ] = state.m_button[ i ];
 
-			if( m_axis != null )
+			if( m_axis is not null )
 				for( uint i = 0; i < AxisCount; i++ )
 					m_axis[ i ] = state.m_axis[ i ];
 
@@ -130,7 +130,7 @@ namespace MiInput
 		public Vector2f NormalizePosition( Vector2f size )
 		{
 			if( size.X <= 0 || size.Y <= 0 )
-				return default( Vector2f );
+				return default;
 
 			return new Vector2f( Position.X / size.X, Position.Y / size.Y );
 		}
@@ -149,9 +149,9 @@ namespace MiInput
 		public Vector2f NormalizePosition( Vector2f pos, Vector2f size )
 		{
 			if( size.X <= 0 || size.Y <= 0 )
-				return default( Vector2f );
+				return default;
 
-			Vector2f position = new Vector2f( Position.X - pos.X, Position.Y - pos.Y );
+			Vector2f position = new( Position.X - pos.X, Position.Y - pos.Y );
 			return new Vector2f( position.X / size.X, position.Y / size.Y );
 		}
 
@@ -173,14 +173,14 @@ namespace MiInput
 		/// </summary>
 		public void Reset()
 		{
-			if( m_button != null )
+			if( m_button is not null )
 				for( uint i = 0; i < ButtonCount; i++ )
 					m_button[ i ] = false;
-			if( m_axis != null )
+			if( m_axis is not null )
 				for( uint i = 0; i < AxisCount; i++ )
 					m_axis[ i ] = 0.0f;
 
-			Position = default( Vector2i );
+			Position = default;
 		}
 
 		/// <summary>
@@ -361,8 +361,31 @@ namespace MiInput
 
 			return true;
 		}
+		/// <summary>
+		///   Checks if this object is equal to another.
+		/// </summary>
+		/// <param name="obj">
+		///   The object to check against.
+		/// </param>
+		/// <returns>
+		///   True if this object is considered equal to the given object.
+		/// </returns>
+		public override bool Equals( object obj )
+		{
+			return Equals( obj as MouseState );
+		}
+		/// <summary>
+		///   Serves the default hash function.
+		/// </summary>
+		/// <returns>
+		///   A hash code for the current object.
+		/// </returns>
+		public override int GetHashCode()
+		{
+			return HashCode.Combine( m_button, m_axis );
+		}
 
-		private bool[] m_button;
-		private float[] m_axis;
+		private readonly bool[] m_button;
+		private readonly float[] m_axis;
 	}
 }

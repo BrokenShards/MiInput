@@ -44,7 +44,7 @@ namespace MiInputTest
 			return val;
 		}
 
-		private static int RunTests( string[] args )
+		private static int RunTests( string[] _ )
 		{
 			if( !ActionTest() )
 				return Logger.LogReturn( "Action test failed.", -1, LogType.Error );
@@ -63,13 +63,14 @@ namespace MiInputTest
 
 		private static bool ActionTest()
 		{
-			Action act = new Action( "test", new InputMap( InputDevice.Joystick, InputType.Button, "0", "1" ) );
+			Action act = new( "test", new InputMap( InputDevice.Joystick, InputType.Button, "0", "1" ) );
 
 			if( !Input.Manager.Actions.Add( act ) )
 				return Logger.LogReturn( "Unable to add valid action to action set.", false, LogType.Error );
 
 			Action a = Input.Manager.Actions[ "test" ];
-			if( a == null )
+
+			if( a is null )
 				return Logger.LogReturn( "Unable to retrieve previously added action from the action set.", false, LogType.Error );
 
 			{
@@ -112,7 +113,7 @@ namespace MiInputTest
 		{
 			Input.Manager.Update();
 
-			Action test = new Action( "test", new InputMap( InputDevice.Joystick, InputType.Button, "A", "B" ) );
+			Action test = new( "test", new InputMap( InputDevice.Joystick, InputType.Button, "A", "B" ) );
 
 			if( !Input.Manager.Actions.Add( test, true ) )
 				return Logger.LogReturn( "Unable to add test action to input manager.", false, LogType.Error );
@@ -121,7 +122,7 @@ namespace MiInputTest
 
 			Logger.Log( "Press A Button." );
 
-			using( RenderWindow window = new RenderWindow( new VideoMode( 640, 480 ), "MiInput Test", Styles.Close ) )
+			using( RenderWindow window = new( new VideoMode( 640, 480 ), "MiInput Test", Styles.Close ) )
 			{
 				window.Closed += OnClose;
 
@@ -131,13 +132,13 @@ namespace MiInputTest
 
 					Input.Manager.Update();
 
-					if( press == 0 && Input.Manager.Actions[ "test" ].IsPressed )
+					if( press is 0 && Input.Manager.Actions[ "test" ].IsPressed )
 					{
 						Logger.Log( "Press B button." );
 						press++;
 					}
 
-					if( press == 1 && Input.Manager.Actions[ "test" ].IsNegative )
+					if( press is 1 && Input.Manager.Actions[ "test" ].IsNegative )
 						press++;
 
 					if( press > 1 )

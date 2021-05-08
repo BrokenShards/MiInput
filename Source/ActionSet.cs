@@ -83,7 +83,7 @@ namespace MiInput
 		/// </summary>
 		public bool Empty
 		{
-			get { return Count == 0; }
+			get { return Count is 0; }
 		}
 		/// <summary>
 		///   The amount of actions in the set.
@@ -103,7 +103,7 @@ namespace MiInput
 		/// </returns>
 		public bool Contains( Action a )
 		{
-			if( a == null )
+			if( a is null )
 				return false;
 
 			return m_actions.ContainsValue( a ) || Contains( a.Name );
@@ -119,7 +119,7 @@ namespace MiInput
 		/// </returns>
 		public bool Contains( string action )
 		{
-			if( action == null )
+			if( action is null )
 				return false;
 
 			foreach( var v in m_actions )
@@ -139,7 +139,7 @@ namespace MiInput
 		/// </returns>
 		public Action Get( string action )
 		{
-			if( action == null )
+			if( action is null )
 				return null;
 
 			foreach( var v in m_actions )
@@ -163,7 +163,7 @@ namespace MiInput
 		/// </returns>
 		public bool Add( Action a, bool replace = false )
 		{
-			if( a == null || !a.IsValid )
+			if( a is null || !a.IsValid )
 				return false;
 
 			if( Contains( a ) )
@@ -189,7 +189,7 @@ namespace MiInput
 		/// </returns>
 		public uint Add( params Action[] acts )
 		{
-			if( acts == null || acts.Length == 0 )
+			if( acts is null || acts.Length is 0 )
 				return 0;
 
 			uint count = 0;
@@ -227,7 +227,7 @@ namespace MiInput
 		{
 			Action a = Get( action );
 
-			if( a == null )
+			if( a is null )
 				return false;
 
 			return m_actions.Remove( a.Name );
@@ -257,14 +257,14 @@ namespace MiInput
 
 			try
 			{
-				XmlDocument doc = new XmlDocument();
+				XmlDocument doc = new();
 				doc.Load( path );
 
 				return LoadFromXml( doc.DocumentElement );
 			}
 			catch( Exception e )
 			{
-				return Logger.LogReturn( "Unable to load action set: " + e.Message, false, LogType.Error );
+				return Logger.LogReturn( $"Unable to load action set: { e.Message }", false, LogType.Error );
 			}
 		}
 
@@ -279,14 +279,14 @@ namespace MiInput
 		/// </returns>
 		public override bool LoadFromXml( XmlElement element )
 		{
-			if( element == null )
+			if( element is null )
 				return Logger.LogReturn( "Failed loading ActionSet: Null xml element.", false, LogType.Error );
 
 			Clear();
 
 			foreach( var x in element.SelectNodes( nameof( Action ) ) )
 			{
-				Action a = new Action();
+				Action a = new();
 
 				if( !a.LoadFromXml( x as XmlElement ) )
 					return Logger.LogReturn( "Failed loading ActionSet: Unable to load Action.", false, LogType.Error );
@@ -305,22 +305,19 @@ namespace MiInput
 		/// </returns>
 		public override string ToString()
 		{
-			StringBuilder sb = new StringBuilder();
+			StringBuilder sb = new();
 
-			sb.Append( "<" );
-			sb.Append( nameof( ActionSet ) );
+			sb.Append( '<' ).Append( nameof( ActionSet ) );
 
 			if( Empty )
-				return sb.ToString() + "/>";
+				return $"{ sb }/>";
 
 			sb.AppendLine( ">" );
 			
 			foreach( var ac in m_actions )
 				sb.AppendLine( ac.Value.ToString( 1 ) );
 
-			sb.Append( "</" );
-			sb.Append( nameof( ActionSet ) );
-			sb.AppendLine( ">" );
+			sb.Append( "</" ).Append( nameof( ActionSet ) ).Append( '>' );
 			return sb.ToString();
 		}
 
@@ -339,6 +336,6 @@ namespace MiInput
 			return ( (IEnumerable<KeyValuePair<string, Action>>)m_actions ).GetEnumerator();
 		}
 
-		private Dictionary<string, Action> m_actions;
+		private readonly Dictionary<string, Action> m_actions;
 	}
 }

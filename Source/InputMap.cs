@@ -95,7 +95,7 @@ namespace MiInput
 		/// </returns>
 		public static bool Collides( InputMap m1, InputMap m2 )
 		{
-			if( m1 == null || !m1.IsValid || m2 == null || !m2.IsValid )
+			if( m1 is null || !m1.IsValid || m2 is null || !m2.IsValid )
 				return false;
 
 			if( m1.Device == m2.Device && m1.Type == m2.Type )
@@ -105,7 +105,7 @@ namespace MiInput
 					   val2 = string.IsNullOrWhiteSpace( m2.Value )    ? null : m2.Value.ToLower(),
 					   neg2 = string.IsNullOrWhiteSpace( m2.Negative ) ? null : m2.Negative.ToLower();
 
-				return ( val1 != null && val1 == neg2 ) || ( val2 != null && val2 == neg1 );
+				return ( val1 is not null && val1 == neg2 ) || ( val2 is not null && val2 == neg1 );
 			}
 
 			return false;
@@ -172,37 +172,37 @@ namespace MiInput
 					( string.IsNullOrWhiteSpace( Value ) && string.IsNullOrWhiteSpace( Negative ) ) )
 					return false;
 
-				if( Device == InputDevice.Keyboard )
+				if( Device is InputDevice.Keyboard )
 				{
-					if( Type != InputType.Button )
+					if( Type is not InputType.Button )
 						return false;
 
 					if( ( !string.IsNullOrWhiteSpace( Value )    && !KeyboardManager.IsKey( Value ) ) ||
 						( !string.IsNullOrWhiteSpace( Negative ) && !KeyboardManager.IsKey( Negative ) ) )
 						return false;
 				}
-				else if( Device == InputDevice.Mouse )
+				else if( Device is InputDevice.Mouse )
 				{
-					if( Type == InputType.Axis )
+					if( Type is InputType.Axis )
 					{
 						if( !MouseManager.IsAxis( Value ) )
 							return false;
 					}
-					else if( Type == InputType.Button )
+					else if( Type is InputType.Button )
 					{
 						if( ( !string.IsNullOrWhiteSpace( Value )    && !MouseManager.IsButton( Value ) ) ||
 							( !string.IsNullOrWhiteSpace( Negative ) && !MouseManager.IsButton( Negative ) ) )
 							return false;
 					}
 				}
-				else if( Device == InputDevice.Joystick )
+				else if( Device is InputDevice.Joystick )
 				{
-					if( Type == InputType.Axis )
+					if( Type is InputType.Axis )
 					{
 						if( !JoystickManager.IsAxis( Value ) )
 							return false;
 					}
-					else if( Type == InputType.Button )
+					else if( Type is InputType.Button )
 					{
 						if( ( !string.IsNullOrWhiteSpace( Value ) && !JoystickManager.IsButton( Value ) ) ||
 							( !string.IsNullOrWhiteSpace( Negative ) && !JoystickManager.IsButton( Negative ) ) )
@@ -246,7 +246,7 @@ namespace MiInput
 		/// </returns>
 		public override bool LoadFromXml( XmlElement ele )
 		{
-			if( ele == null )
+			if( ele is null )
 				return Logger.LogReturn( "Failed loading InputMap: Null xml element.", false, LogType.Error );
 
 			// Type
@@ -285,43 +285,43 @@ namespace MiInput
 				if( string.IsNullOrWhiteSpace( neg ) )
 					neg = null;
 				
-				if( val == null && neg == null )
+				if( val is null && neg is null )
 					return Logger.LogReturn( "Failed loading InputMap: Invalid Positive, Negative and/or Value attributes.", false, LogType.Error );
 
-				if( Device == InputDevice.Keyboard )
+				if( Device is InputDevice.Keyboard )
 				{
-					if( val != null && !KeyboardManager.IsKey( val ) )
+					if( val is not null && !KeyboardManager.IsKey( val ) )
 						return Logger.LogReturn( "Failed loading InputMap: Invalid Positive or Value attribute.", false, LogType.Error );
-					if( neg != null && !KeyboardManager.IsKey( neg ) )
+					if( neg is not null && !KeyboardManager.IsKey( neg ) )
 						return Logger.LogReturn( "Failed loading InputMap: Invalid Negative attribute.", false, LogType.Error );
 				}
-				else if( Device == InputDevice.Mouse )
+				else if( Device is InputDevice.Mouse )
 				{
-					if( Type == InputType.Axis )
+					if( Type is InputType.Axis )
 					{
 						if( !MouseManager.IsAxis( val ) )
 							return Logger.LogReturn( "Failed loading InputMap: Unable to parse mouse axis.", false, LogType.Error );
 					}
-					else if( Type == InputType.Button )
+					else if( Type is InputType.Button )
 					{
-						if( val != null && !MouseManager.IsButton( val ) )
+						if( val is not null && !MouseManager.IsButton( val ) )
 							return Logger.LogReturn( "Failed loading InputMap: Invalid Positive or Value attribute.", false, LogType.Error );
-						if( neg != null && !MouseManager.IsButton( neg ) )
+						if( neg is not null && !MouseManager.IsButton( neg ) )
 							return Logger.LogReturn( "Failed loading InputMap: Invalid Negative attribute.", false, LogType.Error );
 					}
 				}
-				else if( Device == InputDevice.Joystick )
+				else if( Device is InputDevice.Joystick )
 				{
-					if( Type == InputType.Axis )
+					if( Type is InputType.Axis )
 					{
 						if( !JoystickManager.IsAxis( val ) )
 							return Logger.LogReturn( "Failed loading InputMap: Unable to parse joystick axis.", false, LogType.Error );
 					}
-					else if( Type == InputType.Button )
+					else if( Type is InputType.Button )
 					{
-						if( val != null && !JoystickManager.IsButton( val ) )
+						if( val is not null && !JoystickManager.IsButton( val ) )
 							return Logger.LogReturn( "Failed loading InputMap: Invalid Positive or Value attribute.", false, LogType.Error );
-						if( neg != null && !JoystickManager.IsButton( neg ) )
+						if( neg is not null && !JoystickManager.IsButton( neg ) )
 							return Logger.LogReturn( "Failed loading InputMap: Invalid Negative attribute.", false, LogType.Error );
 					}
 				}
@@ -357,45 +357,28 @@ namespace MiInput
 		/// </returns>
 		public override string ToString()
 		{
-			StringBuilder sb = new StringBuilder();
+			StringBuilder sb = new();
 
 			string spacer = Type == InputType.Button ? "        " : "      ";
 
-			sb.Append( Type == InputType.Button ? "<Button " : "<Axis " );
-			sb.Append( nameof( Device ) );
-			sb.Append( "=\"" );
-			sb.Append( Device.ToString() );
-			sb.AppendLine( "\"" );
+			sb.Append( Type == InputType.Button ? "<Button " : "<Axis " )
+				.Append( nameof( Device ) ).Append( "=\"" ).Append( Device.ToString() ).AppendLine( "\"" );
 
-			if( Type == InputType.Axis )
+			if( Type is InputType.Axis )
 			{
-				sb.Append( spacer );
-				sb.Append( nameof( Value ) );
-				sb.Append( "=\"" );
-				sb.Append( string.IsNullOrWhiteSpace( Value ) ? string.Empty : Value );
-				sb.AppendLine( "\"" );
+				sb.Append( spacer ).Append( nameof( Value ) ).Append( "=\"" )
+					.Append( string.IsNullOrWhiteSpace( Value ) ? string.Empty : Value ).AppendLine( "\"" );
 			}
-			else if( Type == InputType.Button )
+			else if( Type is InputType.Button )
 			{
-				sb.Append( spacer );
-				sb.Append( "Positive" );
-				sb.Append( "=\"" );
-				sb.Append( string.IsNullOrWhiteSpace( Value ) ? string.Empty : Value );
-				sb.AppendLine( "\"" );
+				sb.Append( spacer ).Append( "Positive" ).Append( "=\"" )
+					.Append( string.IsNullOrWhiteSpace( Value ) ? string.Empty : Value ).AppendLine( "\"" );
 
-				sb.Append( spacer );
-				sb.Append( nameof( Negative ) );
-				sb.Append( "=\"" );
-				sb.Append( string.IsNullOrWhiteSpace( Negative ) ? string.Empty : Negative );
-				sb.AppendLine( "\"" );
+				sb.Append( spacer ).Append( nameof( Negative ) ).Append( "=\"" )
+					.Append( string.IsNullOrWhiteSpace( Negative ) ? string.Empty : Negative ).AppendLine( "\"" );
 			}
 
-			sb.Append( spacer );
-			sb.Append( nameof( Invert ) );
-			sb.Append( "=\"" );
-			sb.Append( Invert );
-			sb.Append( "\"/>" );
-
+			sb.Append( spacer ).Append( nameof( Invert ) ).Append( "=\"" ).Append( Invert ).Append( "\"/>" );
 			return sb.ToString();
 		}
 	}

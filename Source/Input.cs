@@ -62,11 +62,11 @@ namespace MiInput
 		/// </returns>
 		public static bool IsButton( InputDevice dev, string but )
 		{
-			if( dev == InputDevice.Keyboard )
+			if( dev is InputDevice.Keyboard )
 				return KeyboardManager.IsKey( but );
-			else if( dev == InputDevice.Mouse )
+			else if( dev is InputDevice.Mouse )
 				return MouseManager.IsButton( but );
-			else if( dev == InputDevice.Joystick )
+			else if( dev is InputDevice.Joystick )
 				return JoystickManager.IsButton( but );
 
 			return false;
@@ -85,9 +85,9 @@ namespace MiInput
 		/// </returns>
 		public static bool IsAxis( InputDevice dev, string axis )
 		{
-			if( dev == InputDevice.Mouse )
+			if( dev is InputDevice.Mouse )
 				return MouseManager.IsAxis( axis );
-			else if( dev == InputDevice.Joystick )
+			else if( dev is InputDevice.Joystick )
 				return JoystickManager.IsAxis( axis );
 
 			return false;
@@ -109,11 +109,11 @@ namespace MiInput
 		{
 			get
 			{
-				if( _instance == null )
+				if( _instance is null )
 				{
 					lock( _syncRoot )
 					{
-						if( _instance == null )
+						if( _instance is null )
 						{
 							_instance = new Input();
 						}
@@ -150,9 +150,9 @@ namespace MiInput
 		/// <summary>
 		///   The index of the first connected joystick.
 		/// </summary>
-		public uint FirstJoystick
+		public static uint FirstJoystick
 		{
-			get { return Joystick.FirstConnected; }
+			get { return JoystickManager.FirstConnected; }
 		}
 		
 		/// <summary>
@@ -181,12 +181,12 @@ namespace MiInput
 		/// <returns>
 		///   True if the joystick is connected and false otherwise.
 		/// </returns>
-		public bool JoystickConnected( uint player )
+		public static bool JoystickConnected( uint player )
 		{
 			if( player >= MaxJoysticks )
 				return false;
 
-			return Joystick.IsConnected;
+			return JoystickManager.IsConnected;
 		}
 
 		/// <summary>
@@ -203,11 +203,11 @@ namespace MiInput
 		/// </returns>
 		public bool IsPressed( InputDevice dev, string but )
 		{
-			if( dev == InputDevice.Keyboard )
+			if( dev is InputDevice.Keyboard )
 				return Keyboard.IsPressed( but );
-			else if( dev == InputDevice.Mouse )
+			else if( dev is InputDevice.Mouse )
 				return Mouse.IsPressed( but );
-			else if( dev == InputDevice.Joystick )
+			else if( dev is InputDevice.Joystick )
 				return Joystick.IsPressed( but );
 
 			return false;
@@ -226,11 +226,11 @@ namespace MiInput
 		/// </returns>
 		public bool JustPressed( InputDevice dev, string but )
 		{
-			if( dev == InputDevice.Keyboard )
+			if( dev is InputDevice.Keyboard )
 				return Keyboard.JustPressed( but );
-			else if( dev == InputDevice.Mouse )
+			else if( dev is InputDevice.Mouse )
 				return Mouse.JustPressed( but );
-			else if( dev == InputDevice.Joystick )
+			else if( dev is InputDevice.Joystick )
 				return Joystick.JustPressed( but );
 
 			return false;
@@ -249,11 +249,11 @@ namespace MiInput
 		/// </returns>
 		public bool JustReleased( InputDevice dev, string but )
 		{
-			if( dev == InputDevice.Keyboard )
+			if( dev is InputDevice.Keyboard )
 				return Keyboard.JustReleased( but );
-			else if( dev == InputDevice.Mouse )
+			else if( dev is InputDevice.Mouse )
 				return Mouse.JustReleased( but );
-			else if( dev == InputDevice.Joystick )
+			else if( dev is InputDevice.Joystick )
 				return Joystick.JustReleased( but );
 
 			return false;
@@ -273,9 +273,9 @@ namespace MiInput
 		/// </returns>
 		public float GetAxis( InputDevice dev, string axis )
 		{
-			if( dev == InputDevice.Mouse )
+			if( dev is InputDevice.Mouse )
 				return Mouse.GetAxis( axis );
-			else if( dev == InputDevice.Joystick )
+			else if( dev is InputDevice.Joystick )
 				return Joystick.GetAxis( axis );			
 
 			return 0.0f;
@@ -294,9 +294,9 @@ namespace MiInput
 		/// </returns>
 		public float GetLastAxis( InputDevice dev, string axis )
 		{
-			if( dev == InputDevice.Mouse )
+			if( dev is InputDevice.Mouse )
 				return Mouse.GetLastAxis( axis );
-			else if( dev == InputDevice.Joystick )
+			else if( dev is InputDevice.Joystick )
 				return Joystick.GetLastAxis( axis );
 
 			return 0.0f;
@@ -315,9 +315,9 @@ namespace MiInput
 		/// </returns>
 		public float GetAxisDelta( InputDevice dev, string axis )
 		{
-			if( dev == InputDevice.Mouse )
+			if( dev is InputDevice.Mouse )
 				return Mouse.AxisDelta( axis );
-			else if( dev == InputDevice.Joystick )
+			else if( dev is InputDevice.Joystick )
 				return Joystick.AxisDelta( axis );
 
 			return 0.0f;
@@ -336,9 +336,9 @@ namespace MiInput
 		/// </returns>
 		public bool AxisIsPressed( InputDevice dev, string axis )
 		{
-			if( dev == InputDevice.Mouse )
+			if( dev is InputDevice.Mouse )
 				return Mouse.AxisIsPressed( axis );
-			else if( dev == InputDevice.Joystick )
+			else if( dev is InputDevice.Joystick )
 				return Joystick.AxisIsPressed( axis );
 
 			return false;
@@ -357,9 +357,9 @@ namespace MiInput
 		/// </returns>
 		public bool AxisJustPressed( InputDevice dev, string axis )
 		{
-			if( dev == InputDevice.Mouse )
+			if( dev is InputDevice.Mouse )
 				return Mouse.AxisJustPressed( axis );
-			else if( dev == InputDevice.Joystick )
+			else if( dev is InputDevice.Joystick )
 				return Joystick.AxisJustPressed( axis );
 
 			return false;
@@ -378,9 +378,9 @@ namespace MiInput
 		/// </returns>
 		public bool AxisJustReleased( InputDevice dev, string axis )
 		{
-			if( dev == InputDevice.Mouse )
+			if( dev is InputDevice.Mouse )
 				return Mouse.AxisJustReleased( axis );
-			else if( dev == InputDevice.Joystick )
+			else if( dev is InputDevice.Joystick )
 				return Joystick.AxisJustReleased( axis );
 
 			return false;
@@ -408,16 +408,13 @@ namespace MiInput
 		/// <param name="action">
 		///   The name of the mapped action.
 		/// </param>
-		/// <param name="player">
-		///   The player index.
-		/// </param>
 		/// <returns>
 		///   True if index and action are valid, mapped and was just pressed, otherwise false.
 		/// </returns>
 		/// <exception cref="ArgumentOutOfRangeException">
 		///   If player greater than or equal to <see cref="MaxJoysticks"/>.
 		/// </exception>
-		public bool JustPressed( string action, uint player = 0 )
+		public bool JustPressed( string action )
 		{
 			return Actions.Get( action )?.JustPressed ?? false;
 		}
@@ -427,16 +424,13 @@ namespace MiInput
 		/// <param name="action">
 		///   The name of the mapped action.
 		/// </param>
-		/// <param name="player">
-		///   The player index.
-		/// </param>
 		/// <returns>
 		///   True if index and action are valid, mapped and was just released, otherwise false.
 		/// </returns>
 		/// <exception cref="ArgumentOutOfRangeException">
 		///   If player greater than or equal to <see cref="MaxJoysticks"/>.
 		/// </exception>
-		public bool JustReleased( string action, uint player = 0 )
+		public bool JustReleased( string action )
 		{
 			return Actions.Get( action )?.JustReleased ?? false;
 		}
@@ -446,16 +440,13 @@ namespace MiInput
 		/// <param name="action">
 		///   The name of the mapped action.
 		/// </param>
-		/// <param name="player">
-		///   The player index.
-		/// </param>
 		/// <returns>
 		///   The current value of the mapped action if it is valid, otherwise zero.
 		/// </returns>
 		/// <exception cref="ArgumentOutOfRangeException">
 		///   If player greater than or equal to <see cref="MaxJoysticks"/>.
 		/// </exception>
-		public float GetValue( string action, uint player = 0 )
+		public float GetValue( string action )
 		{
 			return Actions.Get( action )?.Value ?? 0.0f;
 		}
@@ -489,12 +480,12 @@ namespace MiInput
 		/// </returns>
 		public override bool LoadFromXml( XmlElement element )
 		{
-			if( element == null )
+			if( element is null )
 				return Logger.LogReturn( "Failed loading Input: Null xml element.", false, LogType.Error );
 
 			XmlElement set = element[ nameof( ActionSet ) ];
 
-			if( set == null )
+			if( set is null )
 				return Logger.LogReturn( "Failed loading Input: No ActionSet element.", false, LogType.Error );
 
 			Actions = new ActionSet();
@@ -521,14 +512,14 @@ namespace MiInput
 
 			try
 			{
-				XmlDocument doc = new XmlDocument();
+				XmlDocument doc = new();
 				doc.Load( path );
 
 				return LoadFromXml( doc.DocumentElement );
 			}
 			catch( Exception e )
 			{
-				return Logger.LogReturn( "Unable to load input from file: " + e.Message, false, LogType.Error );
+				return Logger.LogReturn( $"Unable to load input from file: { e.Message }", false, LogType.Error );
 			}
 		}
 		/// <summary>
@@ -559,22 +550,16 @@ namespace MiInput
 		/// </returns>
 		public override string ToString()
 		{
-			StringBuilder sb = new StringBuilder();
+			StringBuilder sb = new();
 
-			sb.Append( "<" );
-			sb.Append( nameof( Input ) );
-			sb.AppendLine( ">" );
-
-			sb.AppendLine( Actions.ToString( 1 ) );
-
-			sb.Append( "</" );
-			sb.Append( nameof( Input ) );
-			sb.AppendLine( ">" );
+			sb.Append( '<' ).Append( nameof( Input ) ).AppendLine( ">" )
+				.AppendLine( Actions.ToString( 1 ) )
+			.Append( "</" ).Append( nameof( Input ) ).AppendLine( ">" );
 
 			return sb.ToString();
 		}
 
 		private static volatile Input _instance;
-		private static readonly object _syncRoot = new object();
+		private static readonly object _syncRoot = new();
 	}
 }

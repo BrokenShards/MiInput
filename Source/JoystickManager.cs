@@ -47,7 +47,7 @@ namespace MiInput
 			if( string.IsNullOrEmpty( val ) )
 				return false;
 
-			if( !Enum.TryParse( val, true, out XButton xb ) && ( !uint.TryParse( val, out uint b ) || b >= (uint)XButton.COUNT ) )
+			if( !Enum.TryParse( val, true, out XButton _ ) && ( !uint.TryParse( val, out uint b ) || b >= (uint)XButton.COUNT ) )
 				return false;
 
 			return true;
@@ -88,7 +88,7 @@ namespace MiInput
 			if( string.IsNullOrEmpty( val ) )
 				return false;
 
-			if( !Enum.TryParse( val, true, out XAxis ax ) )
+			if( !Enum.TryParse( val, true, out XAxis _ ) )
 			{
 				if( uint.TryParse( val, out uint b ) )
 				{
@@ -112,7 +112,7 @@ namespace MiInput
 		/// </returns>
 		public static int ToAxis( string val )
 		{
-			if( val != null )
+			if( val is not null )
 			{
 				if( Enum.TryParse( val, true, out XAxis ax ) )
 					return (int)ax;
@@ -146,7 +146,7 @@ namespace MiInput
 		/// <summary>
 		///   If the joystick is connected.
 		/// </summary>
-		public bool IsConnected
+		public static bool IsConnected
 		{
 			get { return GamePad.GetState( (PlayerIndex)FirstConnected ).IsConnected; }
 		}
@@ -154,7 +154,7 @@ namespace MiInput
 		/// <summary>
 		///   The first connected joystick.
 		/// </summary>
-		public uint FirstConnected
+		public static uint FirstConnected
 		{
 			get
 			{
@@ -611,7 +611,7 @@ namespace MiInput
 			return !m_current.AxisIsPressed( ax ) && m_last.AxisIsPressed( ax );
 		}
 
-		private JoystickState m_current,
-						      m_last;
+		private readonly JoystickState m_current;
+		private JoystickState m_last;
 	}
 }

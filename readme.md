@@ -17,6 +17,9 @@ See `MiInputTest/Example.cs` for example code and usage.
 
 ## Changelog
 
+### Version 1.0.0
+- Updated coding style throughout to use newer C# features brought with the change to .Net 5.
+
 ### Version 0.12.0
 - Now using .Net 5 (Core) rather than the .Net Framework.
 - MiCore dependency now from NuGet package.

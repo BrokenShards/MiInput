@@ -176,7 +176,7 @@ namespace MiInput
 		public JoystickState( JoystickState js )
 		{
 			if( js == null )
-				throw new ArgumentNullException();
+				throw new ArgumentNullException( nameof( js ) );
 
 			m_button = ButtonCount > 0 ? new bool[ ButtonCount ] : null;
 			m_axis = AxisCount > 0 ? new float[ AxisCount ] : null;
@@ -195,7 +195,7 @@ namespace MiInput
 		/// </summary>
 		public void Update()
 		{
-			GamePadState state = GamePad.GetState( (PlayerIndex)Input.Manager.FirstJoystick );
+			GamePadState state = GamePad.GetState( (PlayerIndex)Input.FirstJoystick );
 
 			if( !state.IsConnected )
 			{
@@ -421,6 +421,29 @@ namespace MiInput
 					return false;
 
 			return true;
+		}
+		/// <summary>
+		///   Checks if this object is equal to another.
+		/// </summary>
+		/// <param name="obj">
+		///   The object to check against.
+		/// </param>
+		/// <returns>
+		///   True if this object is considered equal to the given object.
+		/// </returns>
+		public override bool Equals( object obj )
+		{
+			return Equals( obj as JoystickState );
+		}
+		/// <summary>
+		///   Serves the default hash function.
+		/// </summary>
+		/// <returns>
+		///   A hash code for the current object.
+		/// </returns>
+		public override int GetHashCode()
+		{
+			return HashCode.Combine( m_axis, m_button );
 		}
 
 		/// <summary>

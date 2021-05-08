@@ -48,7 +48,7 @@ namespace MiInput
 			if( string.IsNullOrEmpty( val ) )
 				return false;
 
-			if( !Enum.TryParse( val, true, out Mouse.Button but ) )
+			if( !Enum.TryParse( val, true, out Mouse.Button _ ) )
 			{
 				if( uint.TryParse( val, out uint b ) )
 				{
@@ -97,7 +97,7 @@ namespace MiInput
 			if( string.IsNullOrEmpty( val ) )
 				return false;
 
-			if( !Enum.TryParse( val, true, out MouseAxis ax ) )
+			if( !Enum.TryParse( val, true, out MouseAxis _ ) )
 			{
 				if( uint.TryParse( val, out uint b ) )
 				{
@@ -272,7 +272,7 @@ namespace MiInput
 		/// <returns>
 		///   The mouse position relative to the given window.
 		/// </returns>
-		public Vector2i GetPosition( Window window )
+		public static Vector2i GetPosition( Window window )
 		{
 			return Mouse.GetPosition( window );
 		}
@@ -701,7 +701,7 @@ namespace MiInput
 			return !m_current.AxisIsPressed( ax ) && m_last.AxisIsPressed( ax );
 		}
 
-		private MouseState m_current,
-						   m_last;
+		private readonly MouseState m_current;
+		private MouseState m_last;
 	}
 }

@@ -98,7 +98,7 @@ namespace MiInput
 		/// </summary>
 		public bool Empty
 		{
-			get { return Count == 0; }
+			get { return Count is 0; }
 		}
 		/// <summary>
 		///   The amount of mapped inputs.
@@ -133,7 +133,7 @@ namespace MiInput
 		/// </returns>
 		public bool Contains( InputMap map )
 		{
-			if( map == null || !map.IsValid )
+			if( map is null || !map.IsValid )
 				return false;
 
 			foreach( InputMap m in m_inputs )
@@ -175,7 +175,7 @@ namespace MiInput
 		/// </returns>
 		public bool Set( uint index, InputMap map )
 		{
-			if( map == null || !map.IsValid || index >= Count )
+			if( map is null || !map.IsValid || index >= Count )
 				return false;
 
 			for( int i = 0; i < Count; i++ )
@@ -196,7 +196,7 @@ namespace MiInput
 		/// </returns>
 		public bool Add( InputMap map )
 		{
-			if( map == null || !map.IsValid )
+			if( map is null || !map.IsValid )
 				return false;
 
 			for( int i = 0; i < Count; i++ )
@@ -217,7 +217,7 @@ namespace MiInput
 		/// </returns>
 		public uint Add( params InputMap[] maps )
 		{
-			if( maps == null )
+			if( maps is null )
 				return 0;
 
 			uint counter = 0;
@@ -257,7 +257,7 @@ namespace MiInput
 		/// </returns>
 		public bool Remove( InputMap map )
 		{
-			if( map == null || !map.IsValid )
+			if( map is null || !map.IsValid )
 				return false;
 
 			return m_inputs.Remove( map );
@@ -278,7 +278,7 @@ namespace MiInput
 		{
 			get
 			{
-				if( m_inputs == null || m_inputs.Count == 0 )
+				if( m_inputs is null || m_inputs.Count is 0 )
 					return 0.0f;
 								
 				for( int i = 0; i < m_inputs.Count; i++ )
@@ -288,7 +288,7 @@ namespace MiInput
 					if( !map.IsValid )
 						continue;
 
-					if( map.Type == InputType.Axis )
+					if( map.Type is InputType.Axis )
 					{
 						float v = map.Device == InputDevice.Mouse ?
 						          Input.Manager.Mouse.GetAxis( m_inputs[ i ].Value ) :
@@ -297,14 +297,14 @@ namespace MiInput
 						if( v != 0.0f )
 							return map.Invert ? -v : v;
 					}
-					else if( map.Type == InputType.Button )
+					else if( map.Type is InputType.Button )
 					{
-						bool p = map.Device == InputDevice.Keyboard ? Input.Manager.Keyboard.IsPressed( m_inputs[ i ].Value ) :
-						       ( map.Device == InputDevice.Mouse    ? Input.Manager.Mouse.IsPressed( m_inputs[ i ].Value ) :
-						       ( map.Device == InputDevice.Joystick ? Input.Manager.Joystick.IsPressed( m_inputs[ i ].Value ) : false ) );
-						bool n = map.Device == InputDevice.Keyboard ? Input.Manager.Keyboard.IsPressed( m_inputs[ i ].Negative ) :
-							   ( map.Device == InputDevice.Mouse    ? Input.Manager.Mouse.IsPressed( m_inputs[ i ].Negative ) :
-							   ( map.Device == InputDevice.Joystick ? Input.Manager.Joystick.IsPressed( m_inputs[ i ].Negative ) : false ) );
+						bool p = map.Device is InputDevice.Keyboard ? Input.Manager.Keyboard.IsPressed( m_inputs[ i ].Value ) :
+						       ( map.Device is InputDevice.Mouse    ? Input.Manager.Mouse.IsPressed( m_inputs[ i ].Value ) :
+						       ( map.Device is InputDevice.Joystick && Input.Manager.Joystick.IsPressed( m_inputs[ i ].Value ) ) );
+						bool n = map.Device is InputDevice.Keyboard ? Input.Manager.Keyboard.IsPressed( m_inputs[ i ].Negative ) :
+							   ( map.Device is InputDevice.Mouse    ? Input.Manager.Mouse.IsPressed( m_inputs[ i ].Negative ) :
+							   ( map.Device is InputDevice.Joystick && Input.Manager.Joystick.IsPressed( m_inputs[ i ].Negative ) ) );
 
 						if( ( p && n ) || ( !p && !n ) )
 							continue;
@@ -353,12 +353,12 @@ namespace MiInput
 					bool pos = false, 
 					     neg = false;
 
-					if( map.Type == InputType.Button )
+					if( map.Type is InputType.Button )
 					{
 						pos = Input.Manager.IsPressed( map.Device, map.Value );
 						neg = Input.Manager.IsPressed( map.Device, map.Negative );
 					}
-					else if( map.Type == InputType.Axis )
+					else if( map.Type is InputType.Axis )
 					{
 						float axis = Input.Manager.GetAxis( map.Device, map.Value );
 
@@ -382,9 +382,10 @@ namespace MiInput
 		{
 			get
 			{
-				foreach( InputMap map in m_inputs )
+				for( int i = 0; i < m_inputs.Count; i++ )
 				{
-					if( Input.Manager.JustPressed( map.Device, map.Value ) && !Input.Manager.JustPressed( map.Device, map.Negative ) )
+					if( Input.Manager.JustPressed( m_inputs[ i ].Device, m_inputs[ i ].Value ) &&
+						!Input.Manager.JustPressed( m_inputs[ i ].Device, m_inputs[ i ].Negative ) )
 						return true;
 				}
 
@@ -398,9 +399,10 @@ namespace MiInput
 		{
 			get
 			{
-				foreach( InputMap map in m_inputs )
+				for( int i = 0; i < m_inputs.Count; i++ )
 				{
-					if( Input.Manager.JustReleased( map.Device, map.Value ) && !Input.Manager.JustReleased( map.Device, map.Negative ) )
+					if( Input.Manager.JustReleased( m_inputs[ i ].Device, m_inputs[ i ].Value ) &&
+						!Input.Manager.JustReleased( m_inputs[ i ].Device, m_inputs[ i ].Negative ) )
 						return true;
 				}
 
@@ -415,7 +417,7 @@ namespace MiInput
 		{
 			get
 			{
-				if( !Naming.IsValid( Name ) || m_inputs == null )
+				if( !Naming.IsValid( Name ) || m_inputs is null )
 					return false;
 
 				for( int i = 0; i < m_inputs.Count - 1; i++ )
@@ -443,7 +445,7 @@ namespace MiInput
 		/// </returns>
 		public override bool LoadFromXml( XmlElement ele )
 		{
-			if( ele == null )
+			if( ele is null )
 				return Logger.LogReturn( "Failed loading Action: Null xml element.", false, LogType.Error );
 
 			if( !ele.HasAttribute( nameof( Name ) ) )
@@ -460,9 +462,9 @@ namespace MiInput
 			{
 				string loname = n.Name.ToLower();
 
-				if( loname == "axis" || loname == "button" )
+				if( loname is "axis" || loname is "button" )
 				{
-					InputMap map = new InputMap();
+					InputMap map = new();
 
 					if( !map.LoadFromXml( n ) )
 						return Logger.LogReturn( "Failed loading Action: Unable to load InputMap.", false, LogType.Error );
@@ -482,27 +484,20 @@ namespace MiInput
 		/// </returns>
 		public override string ToString()
 		{
-			StringBuilder sb = new StringBuilder();
+			StringBuilder sb = new();
 
-			sb.Append( "<" );
-			sb.Append( nameof( Action ) );
-			sb.Append( " " );
-			sb.Append( nameof( Name ) );
-			sb.Append( "=\"" );
-			sb.Append( Name );
-			sb.AppendLine( "\">" );
+			sb.Append( '<' ).Append( nameof( Action ) ).Append( ' ' )
+				.Append( nameof( Name ) ).Append( "=\"" ).Append( Name ).AppendLine( "\">" );
 
-			foreach( InputMap p in m_inputs )
+			for( int i = 0; i < m_inputs.Count - 1; i++ )
 			{
-				if( p == null )
+				if( m_inputs[ i ] is null )
 					continue;
 
-				sb.AppendLine( p.ToString( 1 ) );
+				sb.AppendLine( m_inputs[ i ].ToString( 1 ) );
 			}
 
-			sb.Append( "</" );
-			sb.Append( nameof( Action ) );
-			sb.AppendLine( ">" );
+			sb.Append( "</" ).Append( nameof( Action ) ).Append( '>' );
 			return sb.ToString();
 		}
 
@@ -522,6 +517,6 @@ namespace MiInput
 		}
 
 		private string m_name;
-		private List<InputMap> m_inputs;
+		private readonly List<InputMap> m_inputs;
 	}
 }

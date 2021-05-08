@@ -47,7 +47,7 @@ namespace MiInput
 			if( string.IsNullOrEmpty( val ) )
 				return false;
 
-			if( !Enum.TryParse( val, true, out Key key ) )
+			if( !Enum.TryParse( val, true, out Key _ ) )
 			{
 				if( uint.TryParse( val, out uint b ) )
 				{
@@ -276,7 +276,7 @@ namespace MiInput
 			return false;
 		}
 
-		private KeyboardState m_current,
-		                      m_last;
+		private readonly KeyboardState m_current;
+		private KeyboardState m_last;
 	}
 }

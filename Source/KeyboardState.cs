@@ -371,7 +371,30 @@ namespace MiInput
 
 			return true;
 		}
+        /// <summary>
+		///   Checks if this object is equal to another.
+		/// </summary>
+		/// <param name="obj">
+		///   The object to check against.
+		/// </param>
+		/// <returns>
+		///   True if this object is considered equal to the given object.
+		/// </returns>
+		public override bool Equals( object obj )
+        {
+            return Equals( obj as KeyboardState );
+        }
+        /// <summary>
+		///   Serves the default hash function.
+		/// </summary>
+		/// <returns>
+		///   A hash code for the current object.
+		/// </returns>
+		public override int GetHashCode()
+        {
+            return m_keys.GetHashCode();
+        }
 
-		private bool[] m_keys;
+        private readonly bool[] m_keys;
 	}
 }

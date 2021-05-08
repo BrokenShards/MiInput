@@ -17,6 +17,10 @@ See `MiInputTest/Example.cs` for example code and usage.
 
 ## Changelog
 
+### Version 0.12.0
+- Now using .Net 5 (Core) rather than the .Net Framework.
+- MiCore dependency now from NuGet package.
+
 ### Version 0.11.0
 - Instead of directly using the `SFML.Window.Keyboard.Key` enum for keyboard events, a clone enum
   'Key' is used instead. `Key` does not include `Key.Unknown` or the depreciated keys so iterating
